@@ -1,0 +1,31 @@
+sitemap default label="Default"
+{
+    Frame label="Light control" {
+				Switch item=Light_1
+				Switch item=Light_2
+				Switch item=Light_3
+			}
+    Frame label="Power control" {
+                                Switch item=Power_1
+                                Switch item=Power_2
+                                Switch item=Power_3
+                        }
+
+	Frame {
+		Group item=Main label="Main" icon="firstfloor"
+                Text item=Temperature_Room_Low
+	}
+}
+
+
+
+sitemap main label="Main"
+{
+	Frame {
+		Group item=Main label="Main" icon="firstfloor"
+                Text item=Temperature_Room_Low
+	}
+        Frame label="Charts" {
+        Chart item=Temperature_Room_Low period=4h refresh=20000
+        }
+}
