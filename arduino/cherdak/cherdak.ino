@@ -25,11 +25,17 @@ WebServer webserver(PREFIX, 80);
 #define PIN_2 42
 #define PIN_3 43
 #define PIN_4 44
+#define PIN_5 45
+#define PIN_6 46
+#define PIN_7 47
 
 int pin_1_value = RELAY_OFF;            
 int pin_2_value = RELAY_OFF;           
 int pin_3_value = RELAY_OFF;  
 int pin_4_value = RELAY_OFF;  
+int pin_5_value = RELAY_OFF; 
+int pin_6_value = RELAY_OFF; 
+int pin_7_value = RELAY_OFF; 
 
 /* store the HTML in program memory using the P macro */
 P(On) = "<status>ON</status>";
@@ -58,7 +64,7 @@ void pinsCmd(WebServer &server, WebServer::ConnectionType type, char **url_path,
         /* for url /pins/40/ON url_path[1] will contain 'ON' and  url_path[0] will contain '40' */
         if(strcmp(url_path[1], "ON") == 0){
          value = RELAY_ON;
-        }      
+        }
         
         pin_number = atol(url_path[0]);
         
@@ -74,7 +80,16 @@ void pinsCmd(WebServer &server, WebServer::ConnectionType type, char **url_path,
             break; 
           case PIN_4:
             pin_4_value = value;
-            break;  
+            break;
+          case PIN_5:
+            pin_5_value = value;
+            break;
+          case PIN_6:
+            pin_6_value = value;
+            break;
+         case PIN_7:
+            pin_7_value = value;
+            break;
          }
        
        }
@@ -100,11 +115,23 @@ void pinsCmd(WebServer &server, WebServer::ConnectionType type, char **url_path,
            case PIN_3:
             if(pin_3_value == RELAY_ON)
             {is_on = true;}
-            break;  
+            break;
            case PIN_4:
             if(pin_4_value == RELAY_ON)
             {is_on = true;}
-            break; 
+            break;
+          case PIN_5:
+            if(pin_5_value == RELAY_ON)
+            {is_on = true;}
+            break;
+          case PIN_6:
+            if(pin_6_value == RELAY_ON)
+            {is_on = true;}
+            break;
+          case PIN_7:
+            if(pin_7_value == RELAY_ON)
+            {is_on = true;}
+            break;
          }
           
           
@@ -125,11 +152,17 @@ void setup()
   digitalWrite(PIN_2, RELAY_OFF);
   digitalWrite(PIN_3, RELAY_OFF);
   digitalWrite(PIN_4, RELAY_OFF);
+  digitalWrite(PIN_5, RELAY_OFF);
+  digitalWrite(PIN_6, RELAY_OFF);
+  digitalWrite(PIN_7, RELAY_OFF);
 
   pinMode(PIN_1, OUTPUT);
   pinMode(PIN_2, OUTPUT);
   pinMode(PIN_3, OUTPUT);
   pinMode(PIN_4, OUTPUT);
+  pinMode(PIN_5, OUTPUT);
+  pinMode(PIN_6, OUTPUT);
+  pinMode(PIN_7, OUTPUT);
 
   //Serial.begin(9600);
 
@@ -156,6 +189,9 @@ void loop()
   digitalWrite(PIN_2, pin_2_value);
   digitalWrite(PIN_3, pin_3_value);
   digitalWrite(PIN_4, pin_4_value);
+  digitalWrite(PIN_5, pin_5_value);
+  digitalWrite(PIN_6, pin_6_value);
+  digitalWrite(PIN_7, pin_7_value);
  
 }
 
