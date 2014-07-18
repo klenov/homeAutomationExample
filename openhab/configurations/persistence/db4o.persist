@@ -20,4 +20,7 @@ Items {
     // additionally, persist all temperature and weather values every hour
     Temperature_Room_Low  : strategy = everyUpdate
     Temperature_Room_High : strategy = everyUpdate
+    Temperature_Komorka   : strategy = everyUpdate
+    Temperature_Outside_1 : strategy = everyUpdate
+    Temperature_Outside_2 : strategy = everyUpdate
 }
