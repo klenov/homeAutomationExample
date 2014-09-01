@@ -1,7 +1,7 @@
 Group All
 Group Lights (All)
-Group Power (All)
-Group Temperature (All)
+Group Power (All) 
+Group Temperature (All) <temperature>
 Group Temperature_Room (Temperature)
 
 Number Temperature_Room_Low     "Room low [%.1f C]"        <temperature>   (Temperature_Room)             { onewire="10.13B05B020800#temperature" }
