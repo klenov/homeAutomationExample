@@ -16,8 +16,8 @@ Switch Light_2    "Day 2" (Lights) { http=">[ON:PUT:http://192.168.2.15/pins/42/
 
 Switch Light_3    "Night 1" (Lights) { http=">[ON:PUT:http://192.168.2.15/pins/43/ON] >[OFF:PUT:http://192.168.2.15/pins/43/OFF] <[http://192.168.2.15/pins/43:30000:REGEX(.*?<status>(.*?)</status>.*)]" }
 
-Switch Power_1    "Power 1" (Power) { http=">[ON:PUT:http://192.168.2.15/pins/44/ON] >[OFF:PUT:http://192.168.2.15/pins/44/OFF] <[http://192.168.2.15/pins/44:30000:REGEX(.*?<status>(.*?)</status>.*)]" }
+Switch Power_1    "Power 1" <energy> (Power) { http=">[ON:PUT:http://192.168.2.15/pins/44/ON] >[OFF:PUT:http://192.168.2.15/pins/44/OFF] <[http://192.168.2.15/pins/44:30000:REGEX(.*?<status>(.*?)</status>.*)]" }
 
-Switch Power_2    "Power 2" (Power) { http=">[ON:PUT:http://192.168.2.15/pins/45/ON] >[OFF:PUT:http://192.168.2.15/pins/45/OFF] <[http://192.168.2.15/pins/45:30000:REGEX(.*?<status>(.*?)</status>.*)]" }
+Switch Power_2    "Power 2" <energy> (Power) { http=">[ON:PUT:http://192.168.2.15/pins/45/ON] >[OFF:PUT:http://192.168.2.15/pins/45/OFF] <[http://192.168.2.15/pins/45:30000:REGEX(.*?<status>(.*?)</status>.*)]" }
 
-Switch Power_3    "Power 3" (Power) { http=">[ON:PUT:http://192.168.2.15/pins/46/ON] >[OFF:PUT:http://192.168.2.15/pins/46/OFF] <[http://192.168.2.15/pins/46:30000:REGEX(.*?<status>(.*?)</status>.*)]" }
+Switch Power_3    "Power 3" <energy> (Power) { http=">[ON:PUT:http://192.168.2.15/pins/46/ON] >[OFF:PUT:http://192.168.2.15/pins/46/OFF] <[http://192.168.2.15/pins/46:30000:REGEX(.*?<status>(.*?)</status>.*)]" }

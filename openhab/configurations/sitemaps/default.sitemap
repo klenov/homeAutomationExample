@@ -1,10 +1,14 @@
 sitemap default label="Default"
 {
     Frame label="Light control" {
-		Group item=Lights
+		Switch item=Light_1
+ 	        Switch item=Light_2
+ 		Switch item=Light_3
 	}
     Frame label="Power control" {
-        Group item=Power
+        Switch item=Power_1
+        Switch item=Power_2
+        Switch item=Power_3
     }
 
 	Frame {
