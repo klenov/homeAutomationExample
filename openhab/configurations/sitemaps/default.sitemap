@@ -1,18 +1,26 @@
 sitemap default label="Default"
 {
     Frame label="Light control" {
+        Switch item=Lights mappings=[OFF="All Off"]
 		Switch item=Light_1
- 	        Switch item=Light_2
+ 	    Switch item=Light_2
  		Switch item=Light_3
 	}
     Frame label="Power control" {
+        Switch item=Sockets mappings=[OFF="All Off"]
         Switch item=Power_1
         Switch item=Power_2
         Switch item=Power_3
     }
 
-	Frame {
-		Group item=All label="All" icon="firstfloor"
-        Text item=Temperature_Room_Low
-	}
+    Frame label="Temperature" {
+        Text item=Temperature_Room_Low  {
+            Frame {
+                Switch item=Temperature_Chart_Period label="Chart Period" mappings=[0="Hour", 1="Day", 2="Week"]
+                Chart item=Temperature_Chart period=h refresh=600 visibility=[Temperature_Chart_Period==0, Temperature_Chart_Period=="Uninitialized"]
+                Chart item=Temperature_Chart period=D refresh=3600 visibility=[Temperature_Chart_Period==1]
+                Chart item=Temperature_Chart period=W refresh=3600 visibility=[Temperature_Chart_Period==2]
+            }
+        }
+     }
 }
