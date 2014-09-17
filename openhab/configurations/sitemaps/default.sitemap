@@ -1,13 +1,13 @@
 sitemap default label="Default"
 {
-    Frame label="Light control" {
-        Switch item=Lights mappings=[OFF="All Off"]
+    Frame label="Lights control" {
+        Switch item=Lights label="All Lights" mappings=[OFF="Turn Off"]
 		Switch item=Light_1
  	    Switch item=Light_2
  		Switch item=Light_3
 	}
-    Frame label="Power control" {
-        Switch item=Sockets mappings=[OFF="All Off"]
+    Frame label="Sockets control" {
+        Switch item=Sockets label="All Sockets" mappings=[OFF="Turn Off"]
         Switch item=Power_1
         Switch item=Power_2
         Switch item=Power_3
