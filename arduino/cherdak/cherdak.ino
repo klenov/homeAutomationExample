@@ -2,10 +2,6 @@
    based on Webduino library
    Vasily Klenov, 2014 */
 
-   /* надо переписать пины на массивы
-      и digitalWrite делать только при изменении значения
-    */
-
 #include "SPI.h"
 #include "Ethernet.h"
 #include "WebServer.h"
@@ -33,27 +29,17 @@ WebServer webserver(PREFIX, 80);
 #define PIN_6 46
 #define PIN_7 47
 
-#define PWM_PIN_1 8
-
-int pin_1_value = RELAY_OFF;
-int pin_2_value = RELAY_OFF;
-int pin_3_value = RELAY_OFF;
-int pin_4_value = RELAY_OFF;
-int pin_5_value = RELAY_OFF;
-int pin_6_value = RELAY_OFF;
-int pin_7_value = RELAY_OFF;
-
-int pwm_pin_1_value = LOW; 
+int pin_1_value = RELAY_OFF;            
+int pin_2_value = RELAY_OFF;           
+int pin_3_value = RELAY_OFF;  
+int pin_4_value = RELAY_OFF;  
+int pin_5_value = RELAY_OFF; 
+int pin_6_value = RELAY_OFF; 
+int pin_7_value = RELAY_OFF; 
 
 /* store the HTML in program memory using the P macro */
 P(On) = "<status>ON</status>";
 P(Off) = "<status>OFF</status>";
-
-// переписать тоже на макрос?
-void printPwmStatus(pwm_value){
-  P(pwmMsg) = "<status></status>"; // дописать
-  server.printP(pwmMsg);
-}
 
 void httpNotFound(WebServer &server){
   P(failMsg) =
@@ -79,10 +65,7 @@ void pinsCmd(WebServer &server, WebServer::ConnectionType type, char **url_path,
         if(strcmp(url_path[1], "ON") == 0){
          value = RELAY_ON;
         }
-
-        // тут надо преобразовать строку к числу, это если в запросе передается значение для пвм пина
-        pwm_value = atol(url_path[1]);
-
+        
         pin_number = atol(url_path[0]);
         
         switch (pin_number) {
@@ -104,11 +87,8 @@ void pinsCmd(WebServer &server, WebServer::ConnectionType type, char **url_path,
           case PIN_6:
             pin_6_value = value;
             break;
-          case PIN_7:
+         case PIN_7:
             pin_7_value = value;
-            break;
-          case PWM_PIN_1:
-            pwm_pin_1_value = pwm_value;
             break;
          }
        
@@ -120,57 +100,48 @@ void pinsCmd(WebServer &server, WebServer::ConnectionType type, char **url_path,
   { 
     boolean is_on = false;
     int pin_number;
-    int pwm_value = -1;
     
     pin_number = atol(url_path[0]);
               
-    switch (pin_number) {
-      case PIN_1:
-        if(pin_1_value == RELAY_ON)
-        {is_on = true;}
-        break;
-      case PIN_2:
-        if(pin_2_value == RELAY_ON)
-        {is_on = true;}
-        break;
-       case PIN_3:
-        if(pin_3_value == RELAY_ON)
-        {is_on = true;}
-        break;
-       case PIN_4:
-        if(pin_4_value == RELAY_ON)
-        {is_on = true;}
-        break;
-      case PIN_5:
-        if(pin_5_value == RELAY_ON)
-        {is_on = true;}
-        break;
-      case PIN_6:
-        if(pin_6_value == RELAY_ON)
-        {is_on = true;}
-        break;
-      case PIN_7:
-        if(pin_7_value == RELAY_ON)
-        {is_on = true;}
-        break;
-      case PWM_PIN_1:
-        pwm_value = pwm_pin_1_value;
-        break;
-    }
-    
-    if (pwm_value >= 0)
-    {
-      printPwmStatus( pwm_value );
-    } else
-    {
-      if(is_on)
-      { 
-        server.printP( On );
-      } else 
-      {
-        server.printP( Off );
-      }
-    }
+     switch (pin_number) {
+          case PIN_1:
+            if(pin_1_value == RELAY_ON)
+            {is_on = true;}
+            break;
+          case PIN_2:
+            if(pin_2_value == RELAY_ON)
+            {is_on = true;}
+            break;
+           case PIN_3:
+            if(pin_3_value == RELAY_ON)
+            {is_on = true;}
+            break;
+           case PIN_4:
+            if(pin_4_value == RELAY_ON)
+            {is_on = true;}
+            break;
+          case PIN_5:
+            if(pin_5_value == RELAY_ON)
+            {is_on = true;}
+            break;
+          case PIN_6:
+            if(pin_6_value == RELAY_ON)
+            {is_on = true;}
+            break;
+          case PIN_7:
+            if(pin_7_value == RELAY_ON)
+            {is_on = true;}
+            break;
+         }
+          
+          
+    if(is_on)     
+   { 
+     server.printP( On );
+   } else
+   {
+     server.printP( Off );
+   }
    
   }
 }
@@ -192,9 +163,6 @@ void setup()
   pinMode(PIN_5, OUTPUT);
   pinMode(PIN_6, OUTPUT);
   pinMode(PIN_7, OUTPUT);
-
-  digitalWrite(PWM_PIN_1, LOW);
-  pinMode(PWM_PIN_1, OUTPUT);
 
   //Serial.begin(9600);
 
@@ -224,7 +192,6 @@ void loop()
   digitalWrite(PIN_5, pin_5_value);
   digitalWrite(PIN_6, pin_6_value);
   digitalWrite(PIN_7, pin_7_value);
-
-  analogWrite(PWM_PIN_1, pwm_pin_1_value);
+ 
 }
 
