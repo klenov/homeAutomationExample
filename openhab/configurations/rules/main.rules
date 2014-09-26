@@ -1,0 +1,70 @@
+val Hysteresis = 0.3
+//val Heating_Setpoint_Min_Value = 5
+//val Heating_Setpoint_Max_Value = 28
+//val Heating_Setpoint_Def_Value = 23
+
+var Number setpoint_value = 23
+
+rule "Initialize heating states" 
+  when 
+    System started
+  then
+    if( Heating_Setpoint.state == Uninitialized ) {
+      logInfo("Initialize heating states", "Heating_Setpoint Uninitialized")
+
+      if( Heating_Setpoint.changedSince( parse("1970-01-01") ) )
+      {
+        logInfo("Initialize heating states", "Heating_Setpoint could be restored")
+
+      	var Number saved_setpoint_value = Heating_Setpoint.historicState(now) as DecimalType
+      	if( saved_setpoint_value >= 5 && saved_setpoint_value <= 28 )
+      	{
+      	  setpoint_value = saved_setpoint_value
+      	  logInfo("Initialize heating states, Heating_Setpoint restored", saved_setpoint_value.toString())
+      	}
+      }
+      
+      logInfo("Initialize heating states, Heating_Setpoint set to ", setpoint_value.toString())
+      postUpdate(Heating_Setpoint, setpoint_value)
+    }
+
+    if( Heating_Switch.state == Uninitialized ) {
+      // logInfo("Initialize heating states, Heating_Switch Uninitialized")
+      var OnOffType heating_value = OFF
+      if( Heating_Switch.changedSince(parse("1970-01-01")) )
+      {
+      	heating_value = Heating_Switch.historicState(now, "influxdb") as OnOffType
+      	// logInfo("Initialize heating states, Heating_Switch restored", heating_last_saved_value.toString())
+      }
+
+      // logInfo("Initialize heating states, Heating_Switch set to", heating_value.toString())
+      postUpdate(Heating_Switch, heating_value)
+    }
+end
+	
+// rule "Living room heating"
+// when
+//     Item Heating_Setpoint changed or
+//     Item Heating_Room_Low changed or
+//     Time cron "*/10 * * * *"
+// then
+//     	// get the current setpoint for the living room
+//         var Number setpoint = Temperature_Setpoint.state as DecimalType
+
+//         // get the current temperature in the living room
+//         var Number tempIn  = Temperature_Room_Low.state as DecimalType
+
+//         var Number tempOut = Temperature_Outside_1.state as DecimalType
+
+//         // check if the current temp is below the setpoint (+ hysteresis)
+//         if (tempIn < (setpoint - hysteresis)) {
+//     	    // turn on the heater
+//             if (Heating_DaikinPower.state == OFF)
+//                 Heating_DaikinPower.sendCommand(ON);
+//         } else if (tempIn >= setpoint) {
+//             // setpoint has been reached so switch off the heatpump
+//             if (Heating_DaikinPower.state == ON)
+//                 Heating_DaikinPower.sendCommand(OFF);
+//         }
+// end
+
