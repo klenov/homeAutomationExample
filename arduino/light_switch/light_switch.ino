@@ -1,10 +1,10 @@
 #include <UIPEthernet.h> // https://github.com/ntruchsess/arduino_uip
-#include <RestClient.h> //  https://github.com/csquared/arduino-restclient
+#include <RestClient.h>  //  https://github.com/csquared/arduino-restclient
 
 // можно попробовать переписать на получение стейта
 // типа по адресу /rest/items/Light_1/state
 
-#define DEBUG_SWITCHER
+#define DEBUG_SWITCHER 0
 #define OPENHAB_HOST "192.168.2.2"
 #define OPENHAB_PORT 8080
 
@@ -22,7 +22,7 @@ boolean button_was_pressed [buttons_count] = { 0, 0, 0 };
 unsigned long last_millis = 0;
 
 unsigned long last_pressed_at = 0;
-unsigned long minimal_delay   = 2000;
+unsigned long minimal_delay   = 1000;
 
 RestClient client = RestClient(OPENHAB_HOST, OPENHAB_PORT);
 
@@ -50,6 +50,8 @@ void loop()
   #ifdef DEBUG_SWITCHER
     //Serial.println(".");
   #endif
+  
+  delay(100);
   
   // send request to API if button pressed
   for (int i=0; i<buttons_count; i++) {
