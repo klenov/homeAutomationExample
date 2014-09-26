@@ -1,26 +1,34 @@
 sitemap default label="Default"
 {
-    Frame label="Lights control" {
+    Frame label="Lights" {
         Switch item=Lights label="All Lights" mappings=[OFF="Turn Off"]
 		Switch item=Light_1
  	    Switch item=Light_2
  		Switch item=Light_3
 	}
-    Frame label="Sockets control" {
-        Switch item=Sockets label="All Sockets" mappings=[OFF="Turn Off"]
-        Switch item=Power_1
-        Switch item=Power_2
-        Switch item=Power_3
-    }
 
     Frame label="Temperature" {
-        Text item=Temperature_Room_Low  {
+        Switch item=Heating_Switch
+        Setpoint item=Heating_Setpoint minValue=5 maxValue=28 step=0.5
+        Text item=Temperature_Room {
             Frame {
                 Switch item=Temperature_Chart_Period label="Chart Period" mappings=[0="Hour", 1="Day", 2="Week"]
-                Chart item=Temperature_Chart period=h refresh=600 visibility=[Temperature_Chart_Period==0, Temperature_Chart_Period=="Uninitialized"]
-                Chart item=Temperature_Chart period=D refresh=3600 visibility=[Temperature_Chart_Period==1]
+                Chart item=Temperature_Chart period=h refresh=600 visibility=[Temperature_Chart_Period==0]
+                Chart item=Temperature_Chart period=D refresh=3600 visibility=[Temperature_Chart_Period==1, Temperature_Chart_Period=="Uninitialized"]
                 Chart item=Temperature_Chart period=W refresh=3600 visibility=[Temperature_Chart_Period==2]
+
+                Text item=Temperature_Room_Low
+                Text item=Temperature_Room_High
+                Text item=Temperature_Komorka
+                Text item=Temperature_Outside_1
+                Text item=Temperature_Outside_2
             }
         }
+        Text item=Temperature_Outside
      }
+
+    Frame label="Sockets" {
+        Switch item=Sockets label="All Sockets" mappings=[OFF="Turn Off"]
+        Group item=Sockets label="Sockets" icon="socket"
+    }
 }

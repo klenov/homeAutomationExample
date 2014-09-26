@@ -3,19 +3,22 @@ Group Lights (All)
 Group Sockets (All) 
 Group Temperature (All)
 Group Charts (All)
-Group Temperature_Room (Temperature)
 
-Number Temperature_Room_Low   "Room low [%.1f °C]"  <temperature>   (Temperature_Room)             { onewire="10.13B05B020800#temperature" }
-Number Temperature_Room_High  "Room high [%.1f °C]" <temperature>   (Temperature_Room)             { onewire="10.57875B020800#temperature" }
-Number Temperature_Komorka    "Komorka [%.1f °C]"   <temperature>   (Temperature)             { onewire="10.B89D5B020800#temperature" }
-Number Temperature_Outside_1  "Outside [%.1f °C]"   <temperature>   (Temperature)             { onewire="10.21715B020800#temperature" }
-Number Temperature_Outside_2  "Outside [%.1f °C]"   <temperature>   (Temperature)             { onewire="10.21715B020800#temperature" }
+Number Temperature_Room_Low   "Room low [%.1f °C]"  <temperature>   (Temperature, Temperature_Room)    { onewire="10.13B05B020800#temperature" }
+Number Temperature_Room_High  "Room high [%.1f °C]" <temperature>   (Temperature, Temperature_Room)    { onewire="10.57875B020800#temperature" }
+Number Temperature_Komorka    "Komorka [%.1f °C]"   <temperature>   (Temperature)         { onewire="10.B89D5B020800#temperature" }
+Number Temperature_Outside_1  "Outside [%.1f °C]"   <temperature>   (Temperature, Temperature_Outside) { onewire="10.21715B020800#temperature" }
+Number Temperature_Outside_2  "Outside [%.1f °C]"   <temperature>   (Temperature, Temperature_Outside) { onewire="10.21715B020800#temperature" }
+Group:Number:AVG Temperature_Room	"Avg. Room [%.1f °C]" 	<temperature>
+Group:Number:AVG Temperature_Outside "Avg. Outside [%.1f °C]"  <temperature>
+Number Heating_Setpoint		"Temperature [%.1f °C]" <temperature>
+Switch Heating_Switch       "Heating" <heating>
 
 Switch Light_1    "Day Light 1" (Lights) { http=">[ON:PUT:http://192.168.2.15/pins/40/ON] >[OFF:PUT:http://192.168.2.15/pins/40/OFF] <[http://192.168.2.15/pins/40:30000:REGEX(.*?<status>(.*?)</status>.*)]" }
 
 Switch Light_2    "Day Light 2" (Lights) { http=">[ON:PUT:http://192.168.2.15/pins/42/ON] >[OFF:PUT:http://192.168.2.15/pins/42/OFF] <[http://192.168.2.15/pins/42:30000:REGEX(.*?<status>(.*?)</status>.*)]" }
 
-Switch Light_3    "Night Light (Sphere Lamp)" (Lights) { http=">[ON:PUT:http://192.168.2.15/pins/43/ON] >[OFF:PUT:http://192.168.2.15/pins/43/OFF] <[http://192.168.2.15/pins/43:30000:REGEX(.*?<status>(.*?)</status>.*)]" }
+Switch Light_3    "Night Light" (Lights) { http=">[ON:PUT:http://192.168.2.15/pins/43/ON] >[OFF:PUT:http://192.168.2.15/pins/43/OFF] <[http://192.168.2.15/pins/43:30000:REGEX(.*?<status>(.*?)</status>.*)]" }
 
 Switch Power_1    "Power 1" <socket> (Sockets) { http=">[ON:PUT:http://192.168.2.15/pins/44/ON] >[OFF:PUT:http://192.168.2.15/pins/44/OFF] <[http://192.168.2.15/pins/44:30000:REGEX(.*?<status>(.*?)</status>.*)]" }
 
