@@ -113,34 +113,6 @@ char lights_url_by_button_number(int button_number)
   return (char)(((int)'0') + button_number);
 }
 
-int api_available()
-{
-  set_headers();
-  int status_code = client.get( "/rest" );
-  if ( status_code == 200 )
-  { return 1; }
-  else
-  { return 0; }  
-}
-
-int more_than_4000_millis_passed()
-{
-  unsigned long current_millis = millis();
-  if ( current_millis >= last_millis  )
-  {
-    if ( current_millis - last_millis > 4000 )
-    {
-      last_millis = current_millis;
-      return 1;
-    }
-  }
-  else
-  {
-    last_millis = current_millis;
-  }
-  return 0;
-}
-
 void sturtup_blink()
 {
   for (int i=0; i<30; i++) {
