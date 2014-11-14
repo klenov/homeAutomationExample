@@ -5,13 +5,13 @@
 // типа по адресу /rest/items/Light_1/state
 
 #define DEBUG_SWITCHER 0
-#define OPENHAB_HOST "192.168.2.2"
+#define OPENHAB_HOST "homer.local"
 #define OPENHAB_PORT 8080
 
 const char* CONTENT_TYPE = "Content-Type:text/plain";
 const char* ACCEPT       = "Accept:application/json";
 
-const int main_led_pin   = 16;
+const int main_led_pin  = 16;
 const int buttons_count = 3; 
 // The Ethernet Controller (ENC28J60) uses the SPI pins (10, 11, 12, 13)
 const int buttons [buttons_count] = { 5, 3, 4 };
