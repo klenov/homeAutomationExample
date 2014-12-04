@@ -14,7 +14,7 @@
 
 #define DEBUG_RELAYS_UNIT 0
 
-#define VERSION_STRING "0.0.2"
+#define VERSION_STRING "0.0.3"
 
 #define CRLF "\r\n"
 
@@ -56,7 +56,8 @@ P(Hello) =
 
 void httpNotFound(WebServer &server){
   P(failMsg) =
-    "HTTP/1.0 404 Bad Request" CRLF
+    "HTTP/1.1 404 Not Found" CRLF
+    "Server: Webduino/" WEBDUINO_VERSION_STRING CRLF
     "Content-Type: text/html" CRLF
     CRLF
     "<h2>File Not Found</h2>";
