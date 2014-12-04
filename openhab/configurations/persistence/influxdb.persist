@@ -18,9 +18,11 @@ Items {
     //* : strategy = everyChange, everyDay, restoreOnStartup
 
     // additionally, persist all temperature values
-    Temperature_Room_Low  : strategy = everyUpdate
-    Temperature_Room_High : strategy = everyUpdate
-    Temperature_Komorka   : strategy = everyUpdate
-    Temperature_Outside_1 : strategy = everyUpdate
-    Temperature_Outside_2 : strategy = everyUpdate
+    Temperature_Room_Low  : strategy = everyChange
+    Temperature_Room_High : strategy = everyChange
+    Temperature_Komorka   : strategy = everyChange
+    Temperature_Outside_1 : strategy = everyChange
+    Temperature_Outside_2 : strategy = everyChange
+    Heating_Setpoint      : strategy = everyChange
+    Heating_Switch        : strategy = everyChange
 }
