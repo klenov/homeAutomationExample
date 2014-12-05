@@ -1,29 +1,100 @@
-// IterableExtensions http://download.eclipse.org/modeling/tmf/xtext/javadoc/2.7/org/eclipse/xtext/xbase/lib/IterableExtensions.html
+import org.openhab.core.library.types.*
+import org.openhab.core.library.items.*
+import org.openhab.core.persistence.*
+import org.openhab.model.script.actions.*
+import java.lang.Math
+import java.util.*
 
-val Hysteresis = 0.3
-//val Heating_Setpoint_Min_Value = 5
-//val Heating_Setpoint_Max_Value = 28
-//val Heating_Setpoint_Def_Value = 23
+/*
+events.log
+2014-12-05 18:04:31 - Power_1 received command ON
+2014-12-05 18:04:31 - Power_2 received command ON
+*/
+
+// could be useful:
+//   logInfo("Room heating ==============", typeof(SwitchItem).name )
+//   var lambda = [String s | s.length]
+//   lambda.apply(Power_1).toString() )
+
+// IterableExtensions http://download.eclipse.org/modeling/tmf/xtext/javadoc/2.7/org/eclipse/xtext/xbase/lib/IterableExtensions.html
 
 var Number setpoint_value = 23
 
-rule "Initialize Heating States" 
-  when 
-    System started
-  then
-    logInfo("Initialize heating states", "Rule executed")
-    logInfo("Initialize heating states", Heating_Setpoint.state.toString())
+// rule "Initialize Heating States" 
+//   when 
+//     System started
+//   then
+//     logInfo("Initialize heating states", "Rule executed")
+//     logInfo("Initialize heating states", Heating_Setpoint.state.toString())
 
-    if( Heating_Setpoint.state == Uninitialized ) {
-      postUpdate(Heating_Setpoint, setpoint_value)
-      logInfo("Initialize heating states", "Heating_Setpoint Uninitialized")
-      logInfo("Initialize heating states, Heating_Setpoint set to ", setpoint_value.toString())
+//     if( Heating_Setpoint.state == Uninitialized ) {
+//       postUpdate(Heating_Setpoint, setpoint_value)
+//       logInfo("Initialize heating states", "Heating_Setpoint Uninitialized")
+//       logInfo("Initialize heating states, Heating_Setpoint set to ", setpoint_value.toString())
+//     }
+
+//     if( Heating_Switch.state == Uninitialized ) {
+//       Heating_Switch.sendCommand(OFF)
+//       logInfo("Initialize heating states", "Heating_Switch Uninitialized")
+//       logInfo("Initialize heating states, Heating_Switch set to", "OFF")
+//     }
+// end
+
+rule "Room heating"
+when
+    //Item Heating_Setpoint changed or
+    Item Heating_Switch changed or
+    Time cron "*/5 * * * * ?" // every 5 seconds -- change it!
+then
+    logInfo("Room heating", "=========== Rule executed ===========")
+
+    val hysteresis = 0.5
+    var Number tempIn
+    var Number setPoint
+
+    if(Heating_Setpoint.state instanceof DecimalType) {
+      setPoint = Heating_Setpoint.state as DecimalType 
+      logInfo("Room heating, setPoint = ", setPoint.toString())
+    }
+    else {
+      logInfo("Room heating", "Setpoint is NOT DecimalType")
     }
 
-    if( Heating_Switch.state == Uninitialized ) {
-      Heating_Switch.sendCommand(OFF)
-      logInfo("Initialize heating states", "Heating_Switch Uninitialized")
-      logInfo("Initialize heating states, Heating_Switch set to", "OFF")
+    if(Temperature_Room_Low.state instanceof DecimalType) {
+      tempIn = Temperature_Room_Low.state as DecimalType 
+      logInfo("Room heating, tempIn = ", tempIn.toString())
+    }
+    else {
+      logInfo("Room heating", "Temperature_Room_Low is NOT DecimalType")
+    }
+
+    val turned_on  = Heaters?.members.filter( item| item.state == ON )
+    val turned_off = Heaters?.members.filter( item| item.state == OFF )
+
+    logInfo("Room heating, Heaters turned ON ->", turned_on.toString())
+    logInfo("Room heating, Heaters turned OFF ->", turned_off.toString())
+
+    if (Heating_Switch.state == ON) {
+        logInfo("Room heating", "Heating_Switch is ON")
+        // check if the current temp is below the setPoint (+ hysteresis)
+        if (tempIn < (setPoint - hysteresis)) {
+            logInfo("Room heating", "Temp is below the setPoint")
+
+            // turn on heaters by one            
+            if ( !turned_off.isNullOrEmpty ) {
+              val random_heater = turned_off.sortBy( [SwitchItem item | Math::random] ).head
+              sendCommand(random_heater, ON)
+              logInfo("TURNED ON >>>", random_heater.toString() )
+            }
+
+        } else if (tempIn >= setPoint) {
+            logInfo("Room heating", "Temp is above the setPoint")
+            // setPoint has been reached so switch off heaters
+            turned_on.forEach( item| sendCommand(item, OFF) )
+        }
+    } else
+    {
+        turned_on.forEach( item| sendCommand(item, OFF) )
     }
 end
 
