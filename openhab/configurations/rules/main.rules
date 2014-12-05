@@ -43,8 +43,8 @@ var Number setpoint_value = 23
 rule "Room heating"
 when
     //Item Heating_Setpoint changed or
-    Item Heating_Switch changed or
-    Time cron "*/5 * * * * ?" // every 5 seconds -- change it!
+    //Item Heating_Switch changed or
+    Time cron "0 */2 * * * ?" // every 5 seconds -- change it!
 then
     logInfo("Room heating", "=========== Rule executed ===========")
 
