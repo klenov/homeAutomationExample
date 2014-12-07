@@ -1,0 +1,6 @@
+sitemap system_status label="System Status"
+{
+     Frame {
+       Group item=SystemStatus label="System Status" icon="network"
+     }
+}
