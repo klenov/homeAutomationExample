@@ -1,46 +1,65 @@
+/* Web Switch Unit
+   This script is a part of my home automation setup 
+   Vasily Klenov, 2014
+
+   If you are like me using ethernet shield based on ENC28J60
+   then you should replace '#include <Ethernet.h>' with '#include <UIPEthernet.h>'
+   inside RestClient.h (and all other libraries if you added any).
+   Otherwise if you are using more common ethernet shield
+   you should replace '#include <UIPEthernet.h>' with '#include <Ethernet.h>' in this file.
+   */
+
 #include <UIPEthernet.h> // https://github.com/ntruchsess/arduino_uip
 #include <RestClient.h>  //  https://github.com/csquared/arduino-restclient
 
-// можно попробовать переписать на получение стейта
-// типа по адресу /rest/items/Light_1/state
 
 #define DEBUG_SWITCHER 0
-#define OPENHAB_HOST "homer.local"
+#define OPENHAB_HOST "192.168.2.2"
 #define OPENHAB_PORT 8080
+
+#define SIZE(array) (sizeof(array) / sizeof(*array))
+
+// change this to your own unique value
+const byte mac[] = { 0x9C, 0x92, 0x27, 0x2D, 0xDA, 0x93 };
 
 const char* CONTENT_TYPE = "Content-Type:text/plain";
 const char* ACCEPT       = "Accept:application/json";
 
-const int main_led_pin  = 16;
-const int buttons_count = 3; 
-// The Ethernet Controller (ENC28J60) uses the SPI pins (10, 11, 12, 13)
-const int buttons [buttons_count] = { 5, 3, 4 };
+const int status_led_pin  = 16;
 
-char* lights_url  = "/CMD?Light_X=TOGGLE";
-char* pin_as_char = "X";
-boolean button_was_pressed [buttons_count] = { 0, 0, 0 };
-unsigned long last_millis = 0;
+const int buttons []          = { 3, 4, 5 }; // The Ethernet Controller (ENC28J60) uses the SPI pins 10, 11, 12, 13
+boolean button_was_pressed [] = { 0, 0, 0 };
 
 unsigned long last_pressed_at = 0;
-unsigned long minimal_delay   = 1000;
+const unsigned long minimal_delay   = 1000;
 
 RestClient client = RestClient(OPENHAB_HOST, OPENHAB_PORT);
 
 void setup()
 { 
-  pinMode(main_led_pin, OUTPUT);
+  pinMode(status_led_pin, OUTPUT);
 
   #ifdef DEBUG_SWITCHER
     Serial.begin(9600);
-    Serial.println("connect to network");
+    Serial.println("Buttons setup ...");
   #endif
- 
- setup_buttons();
- sturtup_blink();
- byte mac[] = { 0x9C, 0x92, 0x27, 0x2D, 0xDA, 0x93 };
- if (client.begin(mac) == 0) {
+
+  setup_buttons();
+  sturtup_blink();
+
+  #ifdef DEBUG_SWITCHER
+    Serial.println("Connecting to network ...");
+  #endif
+
+  if (client.begin( const_cast<byte*>(mac) ) == 0 ) {
     #ifdef DEBUG_SWITCHER
       Serial.println("Failed to configure Ethernet using DHCP");
+    #endif
+  } else
+  {
+    #ifdef DEBUG_SWITCHER
+      Serial.println("OK!");
+      Serial.println(Ethernet.localIP());
     #endif
   }
 }
@@ -54,33 +73,32 @@ void loop()
   delay(100);
   
   // send request to API if button pressed
-  for (int i=0; i<buttons_count; i++) {
+  for (int i=0; i<SIZE(buttons); i++) {
     if ( millis() - last_pressed_at > minimal_delay )
     {
       if(!button_was_pressed[i] && digitalRead(buttons[i]) == LOW) {
         #ifdef DEBUG_SWITCHER
           Serial.println("Button pressed!");
         #endif
-        digitalWrite( main_led_pin, HIGH );
+        control_led(HIGH);
         button_was_pressed[i] = true;
 
-        send_request_to_api( i+1 );
+        send_request_to_api( i );
         last_pressed_at = millis();
       }
 
       if(button_was_pressed[i] && digitalRead(buttons[i]) == HIGH)
       {
         button_was_pressed[i] = false;
-        digitalWrite( main_led_pin, LOW );
+        control_led(LOW);
       }
     } 
   }
-  
 }
 
 void setup_buttons()
 {
-  for (int i=0; i<buttons_count; i++) {
+  for (int i=0; i<SIZE(buttons); i++) {
     pinMode(buttons[i], INPUT);
     digitalWrite(buttons[i], HIGH); //internal pull-ups
   }
@@ -94,13 +112,14 @@ void set_headers()
 
 int send_request_to_api(int b_number)
 {
-  lights_url[11] = lights_url_by_button_number(b_number);
   set_headers();
-  int status_code = client.get( lights_url );
+  int status_code;
+
+  status_code = client.get( lights_url_by_button_number(b_number) );
 
   #ifdef DEBUG_SWITCHER
-    Serial.println("GET query:");
-    Serial.print(lights_url);
+    Serial.print("GET query:");
+    Serial.println(lights_url_by_button_number(b_number));
     Serial.print("Status code from server: ");
     Serial.println(status_code);
   #endif
@@ -108,19 +127,38 @@ int send_request_to_api(int b_number)
   return status_code;
 }
 
-char lights_url_by_button_number(int button_number)
+char* lights_url_by_button_number(int button_number)
 {  
-  return (char)(((int)'0') + button_number);
+  switch (button_number) {
+    case 0:
+      return "/CMD?Smart_Switch_1=TOGGLE";
+    case 1:
+      return "/CMD?Smart_Switch_Day_Lights=TOGGLE";
+    case 2:
+      return "/CMD?Smart_Switch_Night_Lights=TOGGLE";
+    default:
+      return "";
+  }
 }
 
 void sturtup_blink()
 {
-  for (int i=0; i<30; i++) {
-    digitalWrite( main_led_pin, HIGH );
+  for (int i=0; i<5; i++) {
+    control_led(HIGH);
     delay(250);
-    digitalWrite( main_led_pin, LOW );
+    control_led(LOW);
     delay(250);
   }
 }
 
+void control_led(int state)
+{
+    #ifdef DEBUG_SWITCHER
+      if(state == LOW)
+        Serial.println("led is off");
+      else
+        Serial.println("led is on");
+    #endif
+    digitalWrite( status_led_pin, state );
+}
 
