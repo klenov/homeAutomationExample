@@ -1,0 +1,51 @@
+#header {
+  text-align:center;
+  padding:5px;
+}
+
+#section {  
+}
+
+#footer {
+}
+
+#chart_container {
+  position: relative;
+  font-family: Arial, Helvetica, sans-serif;
+  margin-top: 20px;
+}
+#chart {
+  position: absolute;
+  left: 30px;
+}
+#y_axis {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 30px;
+}
+#y_axis > svg {  
+  padding-bottom: 20px;
+}
+
+.x_tick {
+  bottom: -15px !important;
+}
+
+#legend {
+  display: inline-block;
+  position: relative;
+}
+
+#legend_container {
+  position: absolute;
+  top: 440px;
+  left: 30px;
+  width: 0;
+}
+
+#controls  {
+  position: absolute;
+  top:  440px;
+  left: 220px;
+}
