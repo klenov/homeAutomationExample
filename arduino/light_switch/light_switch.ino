@@ -7,10 +7,12 @@
    inside RestClient.h (and all other libraries if you added any).
    Otherwise if you are using more common ethernet shield
    you should replace '#include <UIPEthernet.h>' with '#include <Ethernet.h>' in this file.
+
+   For debugging via serial-monitor set DEBUG_SWITCHER to non-zero value.
    */
 
 #include <UIPEthernet.h> // https://github.com/ntruchsess/arduino_uip
-#include <RestClient.h>  //  https://github.com/csquared/arduino-restclient
+#include <RestClient.h>  // https://github.com/csquared/arduino-restclient
 
 
 #define DEBUG_SWITCHER 0
@@ -27,8 +29,8 @@ const char* ACCEPT       = "Accept:application/json";
 
 const int status_led_pin  = 16;
 
-const int buttons []          = { 3, 4, 5 }; // The Ethernet Controller (ENC28J60) uses the SPI pins 10, 11, 12, 13
-boolean button_was_pressed [] = { 0, 0, 0 };
+const int buttons []          = { 3, 4, 5, 6 }; // The Ethernet Controller (ENC28J60) uses the SPI pins 10, 11, 12, 13
+boolean button_was_pressed [] = { 0, 0, 0, 0 };
 
 unsigned long last_pressed_at = 0;
 const unsigned long minimal_delay   = 1000;
@@ -99,9 +101,14 @@ void loop()
 void setup_buttons()
 {
   for (int i=0; i<SIZE(buttons); i++) {
-    pinMode(buttons[i], INPUT);
-    digitalWrite(buttons[i], HIGH); //internal pull-ups
+    pin_as_input(buttons[i]);
   }
+}
+
+void pin_as_input(int pin)
+{
+  pinMode(pin, INPUT);
+  digitalWrite(pin, HIGH); //internal pull-ups
 }
 
 void set_headers()
@@ -135,6 +142,8 @@ char* lights_url_by_button_number(int button_number)
     case 1:
       return "/CMD?Smart_Switch_Day_Lights=TOGGLE";
     case 2:
+      return "/CMD?Smart_Switch_Night_Lights=TOGGLE";
+    case 3:
       return "/CMD?Smart_Switch_Night_Lights=TOGGLE";
     default:
       return "";
