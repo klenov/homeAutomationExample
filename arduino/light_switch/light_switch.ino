@@ -29,8 +29,8 @@ const char* ACCEPT       = "Accept:application/json";
 
 const int status_led_pin  = 16;
 
-const int buttons []          = { 3, 4, 5, 6 }; // The Ethernet Controller (ENC28J60) uses the SPI pins 10, 11, 12, 13
-boolean button_was_pressed [] = { 0, 0, 0, 0 };
+const int buttons []          = { 3, 4, 5, 6, 7 }; // The Ethernet Controller (ENC28J60) uses the SPI pins 10, 11, 12, 13 on Arduino Nano
+boolean button_was_pressed [] = { 0, 0, 0, 0, 0 };
 
 unsigned long last_pressed_at = 0;
 const unsigned long minimal_delay   = 1000;
@@ -138,13 +138,15 @@ char* lights_url_by_button_number(int button_number)
 {  
   switch (button_number) {
     case 0:
-      return "/CMD?Smart_Switch_1=TOGGLE";
+      return "/CMD?Virtual_Switch_1=TOGGLE";
     case 1:
-      return "/CMD?Smart_Switch_Day_Lights=TOGGLE";
+      return "/CMD?Virtual_Switch_2=TOGGLE";
     case 2:
-      return "/CMD?Smart_Switch_Night_Lights=TOGGLE";
+      return "/CMD?Virtual_Switch_3=TOGGLE";
     case 3:
-      return "/CMD?Smart_Switch_Night_Lights=TOGGLE";
+      return "/CMD?Virtual_Switch_4=TOGGLE";
+    case 4:
+      return "/CMD?Virtual_Switch_5=TOGGLE";
     default:
       return "";
   }
