@@ -1,34 +1,37 @@
-sitemap default label="Default"
+sitemap default label=""
 {
-    Frame label="Lights" {
-        Switch item=Lights label="All Lights" mappings=[OFF="Turn Off"]
-		Switch item=Light_1
- 	    Switch item=Light_2
- 		Switch item=Light_3
-	}
-
-    Frame label="Temperature" {
-        Switch item=Heating_Switch
-        Setpoint item=Heating_Setpoint minValue=5 maxValue=28 step=0.5
-        Text item=Temperature_Room {
-            Frame {
-                Switch item=Temperature_Chart_Period label="Chart Period" mappings=[0="Hour", 1="Day", 2="Week"]
-                Chart item=Temperature_Chart period=h refresh=600 visibility=[Temperature_Chart_Period==0]
-                Chart item=Temperature_Chart period=D refresh=3600 visibility=[Temperature_Chart_Period==1, Temperature_Chart_Period=="Uninitialized"]
-                Chart item=Temperature_Chart period=W refresh=3600 visibility=[Temperature_Chart_Period==2]
-
-                Text item=Temperature_Room_Low
-                Text item=Temperature_Room_High
-                Text item=Temperature_Komorka
-                Text item=Temperature_Outside_1
-                Text item=Temperature_Outside_2
-            }
-        }
-        Text item=Temperature_Outside
-     }
-
-    Frame label="Sockets" {
-        Switch item=Sockets label="All Sockets" mappings=[OFF="Turn Off"]
+    Frame {
+        Switch item=Light_1
+        Switch item=Light_2
+        Switch item=Light_4
+        Switch item=Light_3
+        Switch item=Virtual_Switch_5 visibility=[Virtual_Switch_5==ON, Virtual_Switch_5==Uninitialized] mappings=[OFF="Toggle"]
+        Switch item=Virtual_Switch_5 visibility=[Virtual_Switch_5==OFF] mappings=[ON="Toggle"]
+        Switch item=Lights label="All Lights" mappings=[OFF="OFF"]
+        Switch item=Sockets label="All Sockets" mappings=[OFF="OFF"]
         Group item=Sockets label="Sockets" icon="socket"
     }
+
+    Frame {
+        Text item=Temperature_Room {
+            Webview  url="http://192.168.2.2:8080/charts/index.html" height=16
+        }
+        Text item=Temperature_Outside
+        {
+            Frame label="Temp Sensors" {
+                Text item=Raw_Temp_Room_Low
+                Text item=Raw_Temp_Room_High
+                Text item=Raw_Temp_Komorka
+                Text item=Raw_Temp_Outside_1
+                Text item=Raw_Temp_Outside_2
+            }
+        }
+        Switch item=Heating_Switch icon="climate"
+        Setpoint item=Heating_Setpoint minValue=5 maxValue=28 step=0.5
+        Switch item=Quick_Set_Heating_Setpoint label="Quick Set Heating Setpoint" mappings=[5="5°C", 22="22°C"]
+     }
+     
+     Frame {
+       Group item=SystemStatus label="System Status" icon="network"
+       }
 }
