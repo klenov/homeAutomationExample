@@ -1,0 +1,104 @@
+import org.openhab.core.library.types.*
+import org.openhab.core.library.items.*
+import org.openhab.core.persistence.*
+import org.openhab.model.script.actions.*
+import java.lang.Math
+import java.text.DecimalFormat
+
+var Timer virtual_switch_off_timer = null
+
+
+// rule "Virtual_Switch_Day_Lights"
+// when
+//   Item Virtual_Switch_Day_Lights changed
+// then
+//   if ( !DayLights.members.filter( item| item.state == OFF ).isNullOrEmpty )
+//     DayLights.members.filter( item| item.state == OFF ).head.sendCommand(ON)
+//   else
+//     DayLights.members.filter( item| item.state == ON ).forEach( item| item.sendCommand(OFF) )
+// end
+
+rule "Virtual_Switch_1"
+when
+  Item Virtual_Switch_1 changed
+then
+  var item = Light_1
+  if item.state == ON
+    item.sendCommand(OFF)
+  else
+    item.sendCommand(ON)
+end
+
+rule "Virtual_Switch_2"
+when
+  Item Virtual_Switch_2 changed
+then
+  var item = Light_2
+  if item.state == ON
+    item.sendCommand(OFF)
+  else
+    item.sendCommand(ON)
+end
+
+rule "Virtual_Switch_3"
+when
+  Item Virtual_Switch_3 changed
+then
+  var item = Light_3
+  if item.state == ON
+    item.sendCommand(OFF)
+  else
+    item.sendCommand(ON)
+end
+
+rule "Virtual_Switch_4"
+when
+  Item Virtual_Switch_4 changed
+then
+  var item = Anounce_Time
+  if item.state == ON
+    item.sendCommand(OFF)
+  else
+    item.sendCommand(ON)
+end
+
+rule "Virtual_Switch_5"
+when
+  Item Virtual_Switch_5 changed
+then
+  logInfo("Virtual Switch Rule", "executed")
+  
+  // если таймер установлен и еще не выполнен, то отменяем таймер и включаем свет по умолчанию
+  if(virtual_switch_off_timer != null && !virtual_switch_off_timer.hasTerminated)
+  {
+    logInfo("Smart Switch Rule", "Timer virtual_switch_off_timer cancelled") 
+    virtual_switch_off_timer.cancel()
+    virtual_switch_off_timer = null
+    playSound('Beep_Negative.mp3')
+    SmartSwitchDefaultLights.members.filter( item| item.state == OFF ).forEach( item| item.sendCommand(ON) )
+  } else
+  {
+
+    if ( Lights.members.filter( item| item.state == ON ).isNullOrEmpty )
+    {
+      logInfo("Smart Switch Rule", "Turn Lights ON") 
+      SmartSwitchDefaultLights.members.forEach( item| item.sendCommand(ON) )
+    }
+    else
+    {
+      // если никакой вечерний свет не включен то включаем дефолтный свет
+      if ( NightLights.members.filter( item| item.state == ON ).isNullOrEmpty )
+        SmartSwitchDefaultLights.members.filter( item| item.state == OFF ).forEach( item| item.sendCommand(ON) )
+      // выключаем весь дневной свет
+      DayLights.members.filter( item| item.state == ON ).forEach( item| item.sendCommand(OFF) )
+      // ставим таймер
+      //say('timer has been set')
+      //playSound('Computer_Magic.wav')
+      playSound('Bleep.mp3')
+      logInfo("Smart Switch Rule", "Timer Created")
+      virtual_switch_off_timer = createTimer(now.plusSeconds(15)) [| Lights.members.filter( item| item.state == ON ).forEach( item| item.sendCommand(OFF) ) ]
+    }
+  }
+end
+
+

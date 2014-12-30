@@ -1,0 +1,102 @@
+import org.openhab.core.library.types.*
+import org.openhab.core.library.items.*
+import org.openhab.core.persistence.*
+import org.openhab.model.script.actions.*
+import java.lang.Math
+
+//import java.util.*
+
+//import org.joda.time.*
+
+var Number setpoint_value = 23
+
+/*
+events.log
+2014-12-05 18:04:31 - Power_1 received command ON
+2014-12-05 18:04:31 - Power_2 received command ON
+*/
+
+// could be useful:
+//   logInfo("Room heating ==============", typeof(SwitchItem).name )
+//   var lambda = [String s | s.length]
+//   lambda.apply(Power_1).toString() )
+
+// IterableExtensions http://download.eclipse.org/modeling/tmf/xtext/javadoc/2.7/org/eclipse/xtext/xbase/lib/IterableExtensions.html
+
+rule "Quick Set Heating Setpoint"
+when
+  Item Quick_Set_Heating_Setpoint changed
+then
+  logInfo("Quick Set Heating Setpoint", "executed")
+  if(Quick_Set_Heating_Setpoint.state instanceof DecimalType)
+  { 
+    Heating_Setpoint.postUpdate(Quick_Set_Heating_Setpoint.state)
+    Quick_Set_Heating_Setpoint.postUpdate(Uninitialized)
+  }
+end
+
+rule "Room heating"
+when
+    //Item Heating_Setpoint changed or
+    //Item Heating_Switch changed or
+    Time cron "0 0/2 * * * ?" // every 2 minutes
+then
+    logInfo("Room heating", "=========== Rule executed ===========")
+
+    val hysteresis = 0.05
+    var Number tempIn
+    var Number setPoint
+
+    var turned_on  = Heaters.members.filter( item| item.state == ON )
+    var turned_off = Heaters.members.filter( item| item.state == OFF )
+
+    if (Heating_Switch.state != ON)
+    {
+      if ( !turned_on.isNullOrEmpty )
+      {
+        turned_on.forEach( item| item.sendCommand(OFF) )
+        logInfo("TURNED OFF >>> some heaters")
+      }
+    }
+
+    if (Heating_Switch.state == ON)
+    {
+      logInfo("Room heating", "Heating_Switch is ON")
+      logInfo("Room heating, Heaters wich are ON ->", turned_on.toString())
+      logInfo("Room heating, Heaters wich are OFF ->", turned_off.toString())
+
+      if(Heating_Setpoint.state instanceof DecimalType && Temperature_Room.state instanceof DecimalType)
+      {
+        setPoint = Heating_Setpoint.state as DecimalType 
+        logInfo("Room heating, setPoint = ", setPoint.toString())
+
+        tempIn = Temperature_Room.state as DecimalType 
+        logInfo("Room heating, tempIn = ", tempIn.toString())
+
+        if (tempIn < (setPoint - hysteresis))
+        {
+          logInfo("Room heating", "Temp is below the setPoint")
+          // turn on heaters by one            
+          if ( !turned_off.isNullOrEmpty )
+          {
+            val random_heater = turned_off.sortBy( [SwitchItem item | Math::random] ).head
+            logInfo("ACTION: WILL TURN ON >>>", random_heater.toString() )
+            random_heater.sendCommand(ON)
+          }
+        }
+
+        if (tempIn > (setPoint + hysteresis))
+        {
+          logInfo("Room heating", "Temp is above the setPoint")
+          // setPoint has been reached so switch off heaters
+          turned_on.forEach( item| item.sendCommand(OFF) )
+        }
+
+      }
+      else
+      {
+        logError("Room heating", "Temperature_Room or Heating_Setpoint is NOT DecimalType")
+      }
+
+    } 
+end

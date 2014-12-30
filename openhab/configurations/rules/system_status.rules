@@ -1,0 +1,31 @@
+import org.openhab.core.library.types.*
+import org.openhab.core.library.items.*
+import org.openhab.core.persistence.*
+import org.openhab.model.script.actions.*
+
+
+rule "RelaysUnit Monitoring"
+when
+  //Item RelaysUnit changed from ON to OFF
+Item RelaysUnit changed
+then
+  if RelaysUnit.state == ON
+    sendXMPP("klenov@jabber.se", "Info: RelaysUnit is online")
+  else
+    sendXMPP("klenov@jabber.se", "Warning: RelaysUnit is offline") 
+end
+
+rule "Light_Switch_Raspberry Monitoring"
+when
+Item Light_Switch_Raspberry changed from ON to OFF
+then
+  sendXMPP("klenov@jabber.se", "Warning: Light_Switch_Raspberry is offline") 
+end
+
+rule "WirelessLink Monitoring"
+when
+Item WirelessLink changed from ON to OFF
+then
+  sendXMPP("klenov@jabber.se", "Warning: WirelessLink is offline") 
+end
+
