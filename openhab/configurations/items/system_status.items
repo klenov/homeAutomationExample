@@ -4,8 +4,7 @@ Group CommonNetwork (All)
 
 Switch Router                  "Router"                 <network> (SystemStatus, CommonNetwork) { nh="192.168.2.1" }
 Switch WirelessLink            "Wireless Link"          <network> (SystemStatus, CommonNetwork) { nh="192.168.1.10" }
-Switch OldHouse                "Old House"              <network> (SystemStatus, CommonNetwork) { nh="192.168.2.16:139" }
+Switch OldHouse                "Old House"              <network> (SystemStatus, CommonNetwork) { nh="192.168.2.16:139:10000" }
 
-Switch RelaysUnit              "Relays Unit"            <network> (SystemStatus, HomeAutomationNetwork) { nh="192.168.2.15:80" }
 Switch Light_Switch_Raspberry  "Light Switch Raspberry" <network> (SystemStatus, HomeAutomationNetwork) { nh="ned.local" }
-Switch OneWireServer           "1Wire Server"           <network> (SystemStatus, HomeAutomationNetwork) { nh="192.168.2.2:4304" }
+Switch OneWireServer           "1Wire Server"           <network> (SystemStatus, HomeAutomationNetwork) { nh="192.168.2.2:4304:10000" }
