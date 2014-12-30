@@ -1,11 +1,11 @@
 // persistence strategies have a name and a definition and are referred to in the "Items" section
 Strategies {
-    every10m  : "0 0/10 * * * ?"
     everyHour : "0 0 * * * ?"
     everyDay  : "0 0 0 * * ?"
 
     // if no strategy is specified for an item entry below, the default list will be used
     default = everyUpdate
+
 }
 
 /* 
@@ -18,12 +18,6 @@ Items {
     //* : strategy = everyChange, everyDay, restoreOnStartup
 
     // additionally, persist all temperature values
-    Raw_Temp_Room_Low
-    Raw_Temp_Room_High
-    Raw_Temp_Komorka
-    Raw_Temp_Outside_1
-    Raw_Temp_Outside_2
-    // Heating_Setpoint   : everyChange, every15m
-    // Heating_Setpoint [-> "Item_Change_Logging_Heating_Setpoint"]
-    // Main_Door [-> "room.doors.main_door"] // http://influxdb.com/docs/v0.8/advanced_topics/schema_design.html
+    Heating_Setpoint      : strategy = everyChange, restoreOnStartup
+    Heating_Switch        : strategy = everyChange, restoreOnStartup
 }
