@@ -1,6 +1,4 @@
 #header {
-  text-align:center;
-  padding:5px;
 }
 
 #section {  
@@ -11,7 +9,6 @@
 
 #chart_container {
   position: relative;
-  font-family: Arial, Helvetica, sans-serif;
   margin-top: 20px;
 }
 #chart {
@@ -28,24 +25,11 @@
   padding-bottom: 20px;
 }
 
-.x_tick {
-  bottom: -15px !important;
-}
-
-#legend {
-  display: inline-block;
-  position: relative;
-}
-
-#legend_container {
-  position: absolute;
-  top: 440px;
-  left: 30px;
-  width: 0;
-}
-
 #controls  {
-  position: absolute;
-  top:  440px;
-  left: 220px;
+  margin: 30px;
+}
+
+#time_ranges {
+  float: left;
+  margin-right: 30px;
 }

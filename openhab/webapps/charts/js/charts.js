@@ -9,20 +9,25 @@ var series = [];
 
 // colors http://www.mulinblog.com/a-color-palette-optimized-for-data-visualization/
 var series_names = {
-  Raw_Temp_Room_Low:  { default: true,  color: '#4D4D4D', name: "Room Low"  },
-  Raw_Temp_Room_High: { default: false, color: '#5DA5DA', name: "Room High" },
-  Raw_Temp_Komorka:   { default: false, color: '#4D4D4D', name: "Komorka"   },
-  Raw_Temp_Outside_1: { default: true,  color: '#B276B2', name: "Outside 1" },
-  Raw_Temp_Outside_2: { default: false, color: '#60BD68', name: "Outside 2" }
+  Raw_Temp_Room_Low:  { default: true,  color: '#4D4D4D', name: "room low"     },
+  Raw_Temp_Room_High: { default: false, color: '#5DA5DA', name: "room high"    },
+  Raw_Temp_Komorka:   { default: false, color: '#4D4D4D', name: "utility room" },
+  Raw_Temp_Outside_1: { default: true,  color: '#B276B2', name: "outside 1"    },
+  Raw_Temp_Outside_2: { default: false, color: '#60BD68', name: "outside 2"    }
 };
 
 var time_ranges = {
-  '2h':  { default: false, name: "2 hours", appropriate_time_unit: '15 minute', series_prefix: '',     field_prefix: ''      },
+  //'2h':  { default: false, name: "2 hours", appropriate_time_unit: '15 minute', series_prefix: '',     field_prefix: ''      },
   '4h':  { default: false, name: "4 hours", appropriate_time_unit: '15 minute', series_prefix: '',     field_prefix: ''      },
   '8h':  { default: true,  name: "8 hours", appropriate_time_unit: 'hour',      series_prefix: '03m_', field_prefix: 'mean_' },
   '24h': { default: false, name: "a day",   appropriate_time_unit: '6 hour',    series_prefix: '10m_', field_prefix: 'mean_' },
-  '1w':  { default: false, name: "a week",  appropriate_time_unit: '6 hour',    series_prefix: '10m_', field_prefix: 'mean_' },
+  '1w':  { default: false, name: "a week",  appropriate_time_unit: 'day',       series_prefix: '10m_', field_prefix: 'mean_' },
   '4w':  { default: false, name: "a month", appropriate_time_unit: 'day',       series_prefix: '10m_', field_prefix: 'mean_' }
+};
+
+var y_axis_ranges = {
+  a:  { default: true,  min: -30, max: 30, name: "-30°C to 30°C" },
+  b:  { default: false, min: 15,  max: 30, name: "15°C to 30°C"  }
 };
 
 function influxdb_request_data(query) {
@@ -42,8 +47,16 @@ function influxdb_query(item_name) {
   return "select " + selected_time_range.field_prefix + "value from " + selected_time_range.series_prefix + item_name + time_range_query_condition;
 }
 
+function selected_input_key(input_name) {
+  return $("input[name=" + input_name + "]:checked").val();
+}
+
 function selected_time_range_key() {
   return $("input[name=time_ranges]:checked").val();
+}
+
+function selected_y_axis_ranges_key() {
+  return $("input[name=y_axis_ranges]:checked").val();
 }
 
 function make_query_request(item_name) {
@@ -68,16 +81,19 @@ function extract_points(response_data) {
   }).reverse();
 }
 
-function create_radiobuttons(key) {
-  add_control(key, 'radio');
+function create_time_ranges(key) {
+  add_control(key, 'radio', 'time_ranges');
 }
 
-function create_checkboxes(key) {
-  add_control(key, 'checkbox');
+function create_y_axis_ranges(key) {
+  add_control(key, 'radio', 'y_axis_ranges');
 }
 
-function add_control(key, type) {
-  var collection_name = ( type === 'checkbox' ? 'series_names' : 'time_ranges' );
+function create_series_names(key) {
+  add_control(key, 'checkbox', 'series_names');
+}
+
+function add_control(key, type, collection_name) {
   var element = eval(collection_name)[key];
 
   console.log(element);
@@ -95,7 +111,7 @@ function add_graph_series(key) {
 function redraw_chart()
 {
   var checked_checkboxes = $("input[name=series_names]:checked");
-  var items_to_query = $.map( checked_checkboxes, function( val ) { return val.value; });
+  var items_to_query     = $.map( checked_checkboxes, function( val ) { return val.value; });
 
   //console.log(items_to_query);
   
@@ -104,13 +120,20 @@ function redraw_chart()
 
   //graph.configure();
   configure_x_axis();
+  configure_y_min_and_max_values();
+  graph.render();
+}
+
+function reconfigure_y_axis()
+{
+  configure_y_min_and_max_values();
   graph.render();
 }
 
 function configure_x_axis()
 {
   var time  = new Rickshaw.Fixtures.Time.Local();
-  var tmr   = time_ranges[ selected_time_range_key() ];
+  var tmr   = time_ranges[ selected_input_key('time_ranges') ];
 
   var appropriate_units = time.unit( tmr.appropriate_time_unit );
   
@@ -118,20 +141,35 @@ function configure_x_axis()
     x_axis = new Rickshaw.Graph.Axis.Time( { graph: graph, timeUnit: appropriate_units } );
   } else
   {
-    x_axis.fixedTimeUnit = appropriate_units
+    x_axis.fixedTimeUnit = appropriate_units;
   }
+}
+
+function configure_y_min_and_max_values()
+{
+  var selected_y_range = selected_input_key('y_axis_ranges');
+  var y_min = y_axis_ranges[selected_y_range].min;
+  var y_max = y_axis_ranges[selected_y_range].max;
+
+  graph.configure({
+    min: y_min,
+    max: y_max
+  });
 }
 
 
 $(function() {
-  console.log(series_names);
-  Object.keys(time_ranges).forEach(create_radiobuttons);
-  Object.keys(series_names).forEach(create_checkboxes);
+  Object.keys(time_ranges).forEach(create_time_ranges);
+  Object.keys(series_names).forEach(create_series_names);
+  Object.keys(y_axis_ranges).forEach(create_y_axis_ranges);
+
+  var w_width  = Math.round(  $(window).width() * 0.7 );
+  var w_height = Math.round( w_width * 0.4 );
 
   graph = new Rickshaw.Graph( {
     element: document.querySelector("#chart"),
-    width: 900,
-    height: 400,
+    width: w_width,
+    height: w_height,
     renderer: 'line',
     series: [],
     min: -30,
@@ -141,7 +179,8 @@ $(function() {
   var y_axis = new Rickshaw.Graph.Axis.Y( {
       graph: graph,
       orientation: 'left',
-      tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
+      pixelsPerTick: 20,
+      //tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
       element: document.getElementById('y_axis'),
   } );
 
@@ -155,7 +194,8 @@ $(function() {
   redraw_chart();
 
   $( "input[name=series_names]" ).on( "click", redraw_chart );
-  $( "input[name=time_ranges]" ).on( "click", redraw_chart );
+  $( "input[name=time_ranges]"  ).on( "click", redraw_chart );
+  $( "input[name=y_axis_ranges]").on( "click", reconfigure_y_axis );
 });
 
 
