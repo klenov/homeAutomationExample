@@ -76,9 +76,14 @@ function make_query_request(item_name) {
 
 function extract_points(response_data) {
   //console.log(response_data.points);
-  return response_data.points.map(function(point) {
-    return { x: point[0], y: point[2] };
-  }).reverse();
+  var result = [];
+
+  if (typeof response_data != 'undefined'){
+    result = response_data.points.map(function(point) {
+      return { x: point[0], y: point[2] };
+    }).reverse();
+  }
+  return result;
 }
 
 function create_time_ranges(key) {
