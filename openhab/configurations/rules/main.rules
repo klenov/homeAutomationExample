@@ -13,4 +13,14 @@ then
   say("The temperature is " + f.format(Temperature_Outside.state) + " degrees outside, and " + f.format(Temperature_Room.state) + " degrees inside")
 end
 
+rule "Main Door"
+when
+  Item Door_Main changed
+then
+  if Door_Main.state == OPEN
+    sendMail("klenov@gmail.com","Main Door state","Open. Time: " + now.toString("HH:mm:ss dd.MM.yyyy"))
+    //sendXMPP("klenov@jabber.se", "Door is open!")
+  else
+    sendMail("klenov@gmail.com", "Main Door state","Closed. Time: " + now.toString("HH:mm:ss dd.MM.yyyy")) 
+end
 
