@@ -96,7 +96,7 @@ then
       //playSound('Computer_Magic.wav')
       playSound('Bleep.mp3')
       logInfo("Smart Switch Rule", "Timer Created")
-      virtual_switch_off_timer = createTimer(now.plusSeconds(15)) [| Lights.members.filter( item| item.state == ON ).forEach( item| item.sendCommand(OFF) ) ]
+      virtual_switch_off_timer = createTimer(now.plusMinutes(5)) [| Lights.members.filter( item| item.state == ON ).forEach( item| item.sendCommand(OFF) ) ]
     }
   }
 end
