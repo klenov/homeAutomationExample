@@ -10,22 +10,23 @@ Group SmartSwitchDefaultLights (All)
 Group Doors (All)
 
 Group Sockets (All)
-Group Heaters (All) 
+Group Heating_UI (All)
+Group Heaters (All)
 Group Temperature (All)
 Group Charts (All)
 
-Number Raw_Temp_Room_Low   "Room low [%.1f °C]"  <temperature>   (Temperature, Temperature_Room, Temperature_Chart)    { onewire="10.13B05B020800#temperature" }
+Number Raw_Temp_Room_Low   "Room low [%.1f °C]"  <temperature>   (Temperature, Temperature_Room, Temperature_Chart, Heating_UI)    { onewire="10.13B05B020800#temperature" }
 Number Raw_Temp_Room_High  "Room high [%.1f °C]" <temperature>   (Temperature, Temperature_Room)    { onewire="10.57875B020800#temperature" }
 Number Raw_Temp_Komorka    "Komorka [%.1f °C]"   <temperature>   (Temperature)                      { onewire="10.B89D5B020800#temperature" }
-Number Raw_Temp_Outside_1  "Outside [%.1f °C]"   <temperature>   (Temperature, Temperature_Outside, Temperature_Chart) { onewire="10.21715B020800#temperature" }
+Number Raw_Temp_Outside_1  "Outside [%.1f °C]"   <temperature>   (Temperature, Temperature_Outside, Temperature_Chart, Heating_UI) { onewire="10.21715B020800#temperature" }
 Number Raw_Temp_Outside_2  "Outside [%.1f °C]"   <temperature>   (Temperature, Temperature_Outside) { onewire="10.2EA45B020800#temperature" }
 
 Group:Number:AVG Temperature_Room    "Room [%.1f °C]"     <temperature>
 Group:Number:AVG Temperature_Outside "Outside [%.1f °C]"  <temperature>
 
-Number Heating_Setpoint     "Setpoint [%.1f °C]" <temperature>
+Number Heating_Setpoint     "Setpoint [%.1f °C]" <temperature> (Heating_UI)
 Number Quick_Set_Heating_Setpoint    "Temperature [%.1f °C]" <temperature>
-Switch Heating_Switch       "Heating" <heating>
+Switch Heating_Switch       "Heating" <heating> (Heating_UI)
 
 Switch Light_1    "First Day Light"    (Lights, DayLights) { http=">[ON:PUT:http://192.168.2.15/pins/40/ON] >[OFF:PUT:http://192.168.2.15/pins/40/OFF] <[http://192.168.2.15/pins/40:60000:REGEX(.*<status>(.+)</status>.*)]" }
 Switch Light_2    "Second Day Light"   (Lights, DayLights) { http=">[ON:PUT:http://192.168.2.15/pins/42/ON] >[OFF:PUT:http://192.168.2.15/pins/42/OFF] <[http://192.168.2.15/pins/42:60000:REGEX(.*<status>(.+)</status>.*)]" }
@@ -36,7 +37,7 @@ Switch Power_1    "Power 1" <socket> (Sockets, Heaters) { http=">[ON:PUT:http://
 Switch Power_2    "Power 2" <socket> (Sockets, Heaters) { http=">[ON:PUT:http://192.168.2.15/pins/45/ON] >[OFF:PUT:http://192.168.2.15/pins/45/OFF] <[http://192.168.2.15/pins/45:60000:REGEX(.*<status>(.+)</status>.*)]" }
 Switch Power_3    "Power 3" <socket> (Sockets) { http=">[ON:PUT:http://192.168.2.15/pins/46/ON] >[OFF:PUT:http://192.168.2.15/pins/46/OFF] <[http://192.168.2.15/pins/46:60000:REGEX(.*<status>(.+)</status>.*)]" }
 
-Contact Main_Door "Room Door [MAP(en.map):%s]" (Doors)
+Contact Door_Main "Room Door [MAP(en.map):%s]" (Doors)
 
 Group Temperature_Chart (Charts)
 Number Temperature_Chart_Period  "Chart Period"

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <!-- Basic Page Needs
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta charset="utf-8">
+  <title>light heating ui</title>
+
+  <!-- Mobile Specific Metas
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- FONT
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <!-- <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css"> -->
+
+  <!-- CSS
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/skeleton.css">
+
+  <script type="text/javascript">    
+
+    function displayTemp(record) {
+      var id_name;
+      var value;
+      
+      switch (record.name) {
+      case "Raw_Temp_Room_Low":
+        id_name = "room";
+        value = formatNumber(record.state) + " °C";
+        break;
+      case "Raw_Temp_Outside_1":
+        id_name = "outside";
+        value = formatNumber(record.state) + " °C";
+        break;
+      case "Heating_Setpoint":
+        id_name = "setpoint";
+        value = formatNumber(record.state) + " °C";
+        break;
+      // case "Heating_Setpoint":
+      //   id_name = "setpoint";
+      //   value = record.state + " °C";
+      //   break;
+      }
+      if (typeof id_name != 'undefined')
+        document.getElementById(id_name).innerHTML = value;
+    }
+
+    function formatNumber(str)
+    {
+      return Math.round(parseInt(str) * 100) / 100;
+    }
+
+    function callback(response_data) {
+      if (typeof response_data != 'undefined')
+      {
+        response_data.members.forEach(displayTemp);
+      }
+    }
+
+    function postToApi(value) {
+      xmlhttp.onload = updateCurrentState(value);
+      xmlhttp.open("POST", "/rest/items/Heating_Setpoint", true);
+      xmlhttp.send(value);
+    }
+
+    function updateCurrentState(value) {
+      
+      //console.log(this);
+      if (xmlhttp.status === 201 || xmlhttp.status === 200)
+      {
+        document.getElementById("setpoint").innerHTML = value;
+      } else
+      {
+        document.getElementById("error_message").innerHTML = xmlhttp.statusText;
+      }
+    }
+
+    var script = document.createElement('script');
+    script.src = '/rest/items/Heating_UI?type=jsonp&callback=callback';
+    document.head.appendChild(script);
+
+    var xmlhttp = new XMLHttpRequest();
+
+  </script>
+
+</head>
+<body>
+
+  <!-- Primary Page Layout
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <div class="container">
+
+    <h5 style="margin-top: 5%">Change Setpoint</h5>
+
+    <div class="row">
+      <div class="two columns">
+        <input type="submit" value="3 °C" onclick="postToApi(3)">
+      </div>
+      <div class="two columns">
+        <input type="submit" value="5 °C" onclick="postToApi(5)">
+      </div>
+      <div class="two columns">
+        <input type="submit" value="20 °C" onclick="postToApi(20)">
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="one-third column">Current State</div>
+      <div class="two-thirds column" id="setpoint"></div>
+    </div>
+
+    <h5>Temp Sensors</h5>
+
+    <div class="row">
+      <div class="one-third column">Room</div>
+      <div class="two-thirds column" id="room"></div>
+    </div>
+
+    <div class="row">
+      <div class="one-third column">Outside</div>
+      <div class="two-thirds column"  id="outside"></div>
+    </div>
+
+    <div class="row">
+      <div class="one-third column" id="error_message"></div>
+    </div>
+    
+  </div>
+
+<!-- End Document
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+</body>
+</html>
