@@ -1,5 +1,5 @@
 
-var influxdb_url      = "http://192.168.2.2:8086/db/openhab/series";
+var influxdb_url      = "https://192.168.2.2:8084/db/openhab/series";
 var influxdb_username = "openhab";
 var influxdb_password = "7QoWCf9bbF73";
 
@@ -9,17 +9,18 @@ var series = [];
 
 // colors http://www.mulinblog.com/a-color-palette-optimized-for-data-visualization/
 var series_names = {
-  Raw_Temp_Room_Low:  { default: true,  color: '#4D4D4D', name: "room low"     },
-  Raw_Temp_Room_High: { default: false, color: '#5DA5DA', name: "room high"    },
-  Raw_Temp_Komorka:   { default: false, color: '#4D4D4D', name: "utility room" },
-  Raw_Temp_Outside_1: { default: true,  color: '#B276B2', name: "outside 1"    },
-  Raw_Temp_Outside_2: { default: false, color: '#60BD68', name: "outside 2"    }
+  //Raw_Heating_Setpoint:  { default: true,  color: '#F15854', name: "setpoint",  downsampling: false },
+  Raw_Temp_Room_Low:  { default: true,  color: '#4D4D4D', name: "room low",     downsampling: true },
+  Raw_Temp_Room_High: { default: false, color: '#5DA5DA', name: "room high",    downsampling: true },
+  Raw_Temp_Komorka:   { default: false, color: '#4D4D4D', name: "utility room", downsampling: true },
+  Raw_Temp_Outside_1: { default: true,  color: '#B276B2', name: "outside 1",    downsampling: true },
+  Raw_Temp_Outside_2: { default: false, color: '#60BD68', name: "outside 2",    downsampling: true }
 };
 
 var time_ranges = {
   //'2h':  { default: false, name: "2 hours", appropriate_time_unit: '15 minute', series_prefix: '',     field_prefix: ''      },
   '4h':  { default: false, name: "4 hours", appropriate_time_unit: '15 minute', series_prefix: '',     field_prefix: ''      },
-  '8h':  { default: true,  name: "8 hours", appropriate_time_unit: 'hour',      series_prefix: '03m_', field_prefix: 'mean_' },
+  '8h':  { default: true,  name: "8 hours", appropriate_time_unit: 'hour',      series_prefix: '',     field_prefix: '' },
   '24h': { default: false, name: "a day",   appropriate_time_unit: '6 hour',    series_prefix: '10m_', field_prefix: 'mean_' },
   '1w':  { default: false, name: "a week",  appropriate_time_unit: 'day',       series_prefix: '10m_', field_prefix: 'mean_' },
   '4w':  { default: false, name: "a month", appropriate_time_unit: 'day',       series_prefix: '10m_', field_prefix: 'mean_' }
@@ -27,7 +28,8 @@ var time_ranges = {
 
 var y_axis_ranges = {
   a:  { default: true,  min: -30, max: 30, name: "-30°C to 30°C" },
-  b:  { default: false, min: 15,  max: 30, name: "15°C to 30°C"  }
+  b:  { default: false,  min: 0,  max: 30, name: "0°C to 30°C" },
+  c:  { default: false, min: 15,  max: 30, name: "15°C to 30°C"  },
 };
 
 function influxdb_request_data(query) {
@@ -44,7 +46,12 @@ function influxdb_query(item_name) {
   var selected_time_range     = time_ranges[selected_time_range_key()];
   var time_range_query_condition = ' where time > now() - ' + selected_time_range_key();
 
-  return "select " + selected_time_range.field_prefix + "value from " + selected_time_range.series_prefix + item_name + time_range_query_condition;
+  var should_apply_downsampling = series_names[item_name].downsampling;
+
+  var field_prefix  = should_apply_downsampling ? selected_time_range.field_prefix  : ''
+  var series_prefix = should_apply_downsampling ? selected_time_range.series_prefix : ''
+
+  return "select " + field_prefix + "value from " + series_prefix + item_name + time_range_query_condition;
 }
 
 function selected_input_key(input_name) {
