@@ -72,9 +72,10 @@ then
   {
     logInfo("Smart Switch Rule", "Timer virtual_switch_off_timer cancelled") 
     virtual_switch_off_timer.cancel()
+    logInfo("Smart Switch Rule", "Timer Canceled")
     virtual_switch_off_timer = null
     playSound('Beep_Negative.mp3')
-    SmartSwitchDefaultLights.members.filter( item| item.state == OFF ).forEach( item| item.sendCommand(ON) )
+    callScript("turn_on_default_lights")
   } else
   {
     if ( Lights.members.filter( item| item.state == ON ).isNullOrEmpty )
@@ -85,7 +86,7 @@ then
     else
     {
       if ( NightLights.members.filter( item| item.state == ON ).isNullOrEmpty )
-        SmartSwitchDefaultLights.members.filter( item| item.state == OFF ).forEach( item| item.sendCommand(ON) )
+        callScript("turn_on_default_lights")
       DayLights.members.filter( item| item.state == ON ).forEach( item| item.sendCommand(OFF) )
       playSound('Bleep.mp3')
       logInfo("Smart Switch Rule", "Timer Created")

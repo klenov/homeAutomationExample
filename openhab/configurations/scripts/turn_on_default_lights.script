@@ -1,0 +1,1 @@
+SmartSwitchDefaultLights.members.filter( item| item.state == OFF ).forEach( item| item.sendCommand(ON) )
