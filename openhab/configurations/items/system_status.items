@@ -8,3 +8,5 @@ Switch OldHouse                "Old House"              <network> (SystemStatus,
 
 Switch Light_Switch_Raspberry  "Light Switch Raspberry" <network> (SystemStatus, HomeAutomationNetwork) { nh="ned.local" }
 Switch OneWireServer           "1Wire Server"           <network> (SystemStatus, HomeAutomationNetwork) { nh="192.168.2.2:4304:10000" }
+
+Switch InfluxDB_State    "InfluxDB" <network> (SystemStatus) { http="<[http://192.168.2.2:8086/db/openhab/series?u=openhab&p=7QoWCf9bbF73&q=select+value+from+Raw_Temp_Room_Low+limit+1&time_precision=s:20000:JS(influxdb_state.js)]" }
