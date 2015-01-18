@@ -1,7 +1,7 @@
 
-var influxdb_url      = "https://192.168.2.2:8084/db/openhab/series";
+var influxdb_url      = "http://192.168.2.2:8086/db/openhab/series";
 var influxdb_username = "openhab";
-var influxdb_password = "7QoWCf9bbF73";
+var influxdb_password = "influxdb_fake_password";
 
 var graph;
 var x_axis;
@@ -23,7 +23,8 @@ var time_ranges = {
   '8h':  { default: true,  name: "8 hours", appropriate_time_unit: 'hour',      series_prefix: '',     field_prefix: '' },
   '24h': { default: false, name: "a day",   appropriate_time_unit: '6 hour',    series_prefix: '10m_', field_prefix: 'mean_' },
   '1w':  { default: false, name: "a week",  appropriate_time_unit: 'day',       series_prefix: '10m_', field_prefix: 'mean_' },
-  '4w':  { default: false, name: "a month", appropriate_time_unit: 'day',       series_prefix: '10m_', field_prefix: 'mean_' }
+  '4w':  { default: false, name: "a month", appropriate_time_unit: 'day',       series_prefix: '10m_', field_prefix: 'mean_' },
+  '48w':  { default: false, name: "a year", appropriate_time_unit: 'week',       series_prefix: '10m_', field_prefix: 'mean_' }
 };
 
 var y_axis_ranges = {
