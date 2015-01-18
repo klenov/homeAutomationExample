@@ -68,7 +68,6 @@ when
 then
   logInfo("Virtual Switch Rule", "executed")
   
-  // если таймер установлен и еще не выполнен, то отменяем таймер и включаем свет по умолчанию
   if(virtual_switch_off_timer != null && !virtual_switch_off_timer.hasTerminated)
   {
     logInfo("Smart Switch Rule", "Timer virtual_switch_off_timer cancelled") 
@@ -78,7 +77,6 @@ then
     SmartSwitchDefaultLights.members.filter( item| item.state == OFF ).forEach( item| item.sendCommand(ON) )
   } else
   {
-
     if ( Lights.members.filter( item| item.state == ON ).isNullOrEmpty )
     {
       logInfo("Smart Switch Rule", "Turn Lights ON") 
@@ -86,14 +84,9 @@ then
     }
     else
     {
-      // если никакой вечерний свет не включен то включаем дефолтный свет
       if ( NightLights.members.filter( item| item.state == ON ).isNullOrEmpty )
         SmartSwitchDefaultLights.members.filter( item| item.state == OFF ).forEach( item| item.sendCommand(ON) )
-      // выключаем весь дневной свет
       DayLights.members.filter( item| item.state == ON ).forEach( item| item.sendCommand(OFF) )
-      // ставим таймер
-      //say('timer has been set')
-      //playSound('Computer_Magic.wav')
       playSound('Bleep.mp3')
       logInfo("Smart Switch Rule", "Timer Created")
       virtual_switch_off_timer = createTimer(now.plusMinutes(5)) [| Lights.members.filter( item| item.state == ON ).forEach( item| item.sendCommand(OFF) ) ]

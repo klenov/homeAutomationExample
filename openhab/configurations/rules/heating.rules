@@ -96,6 +96,7 @@ then
       else
       {
         logError("Room heating", "Temperature_Room or Heating_Setpoint is NOT DecimalType")
+        sendMail("klenov@gmail.com","Room heating","Error: Temperature_Room or Heating_Setpoint is NOT DecimalType")
       }
 
     } 

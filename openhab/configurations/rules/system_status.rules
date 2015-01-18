@@ -3,29 +3,36 @@ import org.openhab.core.library.items.*
 import org.openhab.core.persistence.*
 import org.openhab.model.script.actions.*
 
+rule "InfluxDB Monitoring"
+when
+  Item InfluxDB_State changed from ON to OFF
+then
+  sendMail("klenov@gmail.com","OpenHAB Monitoring","Warning: No new data in InfluxDB. Time: " + now.toString("HH:mm:ss dd.MM.yyyy"))
+end
+
 
 rule "RelaysUnit Monitoring"
 when
   //Item RelaysUnit changed from ON to OFF
-Item RelaysUnit changed
+  Item RelaysUnit changed
 then
   if RelaysUnit.state == ON
-    sendXMPP("klenov@jabber.se", "Info: RelaysUnit is online")
+    sendMail("klenov@gmail.com","OpenHAB Monitoring","Info: RelaysUnit is online. Time: " + now.toString("HH:mm:ss dd.MM.yyyy"))
   else
-    sendXMPP("klenov@jabber.se", "Warning: RelaysUnit is offline") 
+    sendMail("klenov@gmail.com","OpenHAB Monitoring","Warning: RelaysUnit is offline. Time: " + now.toString("HH:mm:ss dd.MM.yyyy"))
 end
 
 rule "Light_Switch_Raspberry Monitoring"
 when
-Item Light_Switch_Raspberry changed from ON to OFF
+  Item Light_Switch_Raspberry changed from ON to OFF
 then
-  sendXMPP("klenov@jabber.se", "Warning: Light_Switch_Raspberry is offline") 
+  sendMail("klenov@gmail.com","Warning: Light_Switch_Raspberry is offline. Time: " + now.toString("HH:mm:ss dd.MM.yyyy"))
 end
 
 rule "WirelessLink Monitoring"
 when
-Item WirelessLink changed from ON to OFF
+  Item WirelessLink changed from ON to OFF
 then
-  sendXMPP("klenov@jabber.se", "Warning: WirelessLink is offline") 
+  sendMail("klenov@gmail.com","Warning: Warning: WirelessLink is offline. Time: " + now.toString("HH:mm:ss dd.MM.yyyy"))
 end
 
