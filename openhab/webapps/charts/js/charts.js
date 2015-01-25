@@ -9,7 +9,7 @@ var series = [];
 
 // colors http://www.mulinblog.com/a-color-palette-optimized-for-data-visualization/
 var series_names = {
-  //Raw_Heating_Setpoint:  { default: true,  color: '#F15854', name: "setpoint",  downsampling: false },
+  '10m_Heating_Setpoint': { default: true,  color: '#F15854', name: "setpoint",   downsampling: false },
   Raw_Temp_Room_Low:  { default: true,  color: '#4D4D4D', name: "room low",     downsampling: true },
   Raw_Temp_Room_High: { default: false, color: '#5DA5DA', name: "room high",    downsampling: true },
   Raw_Temp_Komorka:   { default: false, color: '#4D4D4D', name: "utility room", downsampling: true },

@@ -22,7 +22,7 @@ Items {
     Raw_Temp_Komorka   : strategy = everyUpdate
     Raw_Temp_Outside_1 : strategy = everyUpdate
     Raw_Temp_Outside_2 : strategy = everyUpdate
-    // Heating_Setpoint   : everyChange, every15m
-    // Heating_Setpoint [-> "Item_Change_Logging_Heating_Setpoint"]
-    // Main_Door [-> "room.doors.main_door"] // http://influxdb.com/docs/v0.8/advanced_topics/schema_design.html
+
+    Heating_Setpoint -> "10m_Heating_Setpoint" : strategy = everyChange
+    // Main_Door -> "room.doors.main_door" // http://influxdb.com/docs/v0.8/advanced_topics/schema_design.html
 }
