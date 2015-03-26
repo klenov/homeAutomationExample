@@ -41,7 +41,7 @@ void setup()
 { 
   pinMode(status_led_pin, OUTPUT);
 
-  #ifdef DEBUG_SWITCHER
+  #if DEBUG_SWITCHER
     Serial.begin(9600);
     Serial.println("Buttons setup ...");
   #endif
@@ -49,17 +49,17 @@ void setup()
   setup_buttons();
   sturtup_blink();
 
-  #ifdef DEBUG_SWITCHER
+  #if DEBUG_SWITCHER
     Serial.println("Connecting to network ...");
   #endif
 
   if (client.begin( const_cast<byte*>(mac) ) == 0 ) {
-    #ifdef DEBUG_SWITCHER
+    #if DEBUG_SWITCHER
       Serial.println("Failed to configure Ethernet using DHCP");
     #endif
   } else
   {
-    #ifdef DEBUG_SWITCHER
+    #if DEBUG_SWITCHER
       Serial.println("OK!");
       Serial.println(Ethernet.localIP());
     #endif
@@ -68,7 +68,7 @@ void setup()
 
 void loop()
 {
-  #ifdef DEBUG_SWITCHER
+  #if DEBUG_SWITCHER
     //Serial.println(".");
   #endif
   
@@ -79,7 +79,7 @@ void loop()
     if ( millis() - last_pressed_at > minimal_delay )
     {
       if(!button_was_pressed[i] && digitalRead(buttons[i]) == LOW) {
-        #ifdef DEBUG_SWITCHER
+        #if DEBUG_SWITCHER
           Serial.println("Button pressed!");
         #endif
         control_led(HIGH);
@@ -124,7 +124,7 @@ int send_request_to_api(int b_number)
 
   status_code = client.get( lights_url_by_button_number(b_number) );
 
-  #ifdef DEBUG_SWITCHER
+  #if DEBUG_SWITCHER
     Serial.print("GET query:");
     Serial.println(lights_url_by_button_number(b_number));
     Serial.print("Status code from server: ");
@@ -164,7 +164,7 @@ void sturtup_blink()
 
 void control_led(int state)
 {
-    #ifdef DEBUG_SWITCHER
+    #if DEBUG_SWITCHER
       if(state == LOW)
         Serial.println("led is off");
       else
