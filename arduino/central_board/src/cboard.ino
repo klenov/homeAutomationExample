@@ -14,12 +14,12 @@
 
 
 /* #################  1Wire                                                   */
-
-#define TEMP_PUBLISH_DELAY 20000
+// ar =[]; "1021715B020800AF".split(//).each_slice(2) { |e| ar+= [e.join] }; ar.map{ |e| "0x" + e }.join(', ')
+#define TEMP_PUBLISH_DELAY 40000
 uint32_t last_temp_read = 0;
 
-#define TEMPERATURE_PRECISION  9
-#define TEMP_MAX_FLOAT_LENGTH  5
+#define TEMPERATURE_PRECISION   9
+#define TEMP_MAX_FLOAT_LENGTH   5
 #define TEMP_SENSOR_NAME_LENGTH 3
 
 const uint8_t one_wire_pin_1 = 22;
@@ -42,15 +42,17 @@ struct TempSensor {
 // DeviceAddress  room_low = { 0x10, 0x13, 0xB0, 0x5B, 0x02, 0x08, 0x00, 0xC3 }, 
 //               room_high = { 0x10, 0x57, 0x87, 0x5B, 0x02, 0x08, 0x00, 0xBF };
 
-TempSensor room_low  = { room_temp, { 0x10, 0x13, 0xB0, 0x5B, 0x02, 0x08, 0x00, 0xC3 }, "RL" };
+TempSensor room_low  = { room_temp, { 0x10, 0x13, 0xB0, 0x5B, 0x02, 0x08, 0x00, 0xC3 }, "RL" }; // !!! name can't be longer than TEMP_SENSOR_NAME_LENGTH - 1
 TempSensor room_high = { room_temp, { 0x10, 0x57, 0x87, 0x5B, 0x02, 0x08, 0x00, 0xBF }, "RH" };
 
-DeviceAddress  out1, out2;
+TempSensor out_1  = { outside_temp, { 0x10, 0x21, 0x71, 0x5B, 0x02, 0x08, 0x00, 0xAF }, "O1" };
+TempSensor out_2  = { outside_temp, { 0x10, 0x2E, 0xA4, 0x5B, 0x02, 0x08, 0x00, 0x07 }, "O2" };
+TempSensor chulan = { outside_temp, { 0x10, 0xB8, 0x9D, 0x5B, 0x02, 0x08, 0x00, 0x73 }, "CH" };
 
-TempSensor temp_sensors[] = { room_low, room_high };
+// DeviceAddress  out1, out2, out3;
 
-// DeviceAddress  out1 = { 0x10, 0x13, 0xB0, 0x5B, 0x02, 0x08, 0x00, 0xC3 }, 
-//                out2 = { 0x10, 0x57, 0x87, 0x5B, 0x02, 0x08, 0x00, 0xBF };
+TempSensor temp_sensors[] = { room_low, room_high, out_1, out_2, chulan };
+
 
 void setupTempSensors() {
   room_temp.begin();
@@ -65,8 +67,19 @@ void setupTempSensors() {
   // if (!room_temp.getAddress(room_high, 1)) aSerial.l(Level::v).println("Unable to find address for Device 1"); 
   // printAddress(room_high);
 
-  room_temp.setResolution(room_low.address,  TEMPERATURE_PRECISION);
-  room_temp.setResolution(room_high.address, TEMPERATURE_PRECISION);
+  // if (!outside_temp.getAddress(out1, 0)) aSerial.l(Level::v).println("Unable to find address for Device 0");
+  // printAddress(out1);
+
+  // if (!outside_temp.getAddress(out2, 1)) aSerial.l(Level::v).println("Unable to find address for Device 1"); 
+  // printAddress(out2);
+
+  // if (!outside_temp.getAddress(out3, 2)) aSerial.l(Level::v).println("Unable to find address for Device 2"); 
+  // printAddress(out3);
+  
+  for (int i=0; i<SIZE(temp_sensors); i++) {
+    temp_sensors[i].bus.setResolution( temp_sensors[i].address,  TEMPERATURE_PRECISION);
+  }
+
 }
 
 // function to print a device address
@@ -76,6 +89,7 @@ void printAddress(DeviceAddress deviceAddress) {
     if (deviceAddress[i] < 16) aSerial.l(Level::v).p("0");
     aSerial.l(Level::v).p(deviceAddress[i], HEX);
   }
+  aSerial.l(Level::v).pln("");
 }
 
 // function to print the temperature for a device
@@ -83,23 +97,16 @@ float getTemperature(DallasTemperature &bus, DeviceAddress deviceAddress) {
   return bus.getTempC(deviceAddress);
 }
 
-// // function to print a device's resolution
-// void printResolution(DeviceAddress deviceAddress)
-// {
-//   Serial.print("Resolution: ");
-//   Serial.print(sensors.getResolution(deviceAddress));
-//   Serial.println();    
-// }
+void tempSensorsLoop() {
+  if(millis() - last_temp_read > TEMP_PUBLISH_DELAY) {
+    room_temp.requestTemperatures();
+    outside_temp.requestTemperatures();
 
-// // main function to print information about a device
-// void printData(DeviceAddress deviceAddress)
-// {
-//   Serial.print("Device Address: ");
-//   printAddress(deviceAddress);
-//   Serial.print(" ");
-//   printTemperature(deviceAddress);
-//   Serial.println();
-// }
+    publishTempSensors();
+
+    last_temp_read = millis();
+  }
+}
 
 
 /* #################  Ethernet                                                */
@@ -188,7 +195,7 @@ void publishPinStates() {
 void publishTemp(int16_t temp_index) {
   aSerial.l(Level::vvvv).p("publishTemp: ");
 
-  char topic_plus_sensor_name[ strlen(MQTT_TEMP_TOPIC "XX") ] = "";
+  char topic_plus_sensor_name[ strlen(MQTT_TEMP_TOPIC) + TEMP_SENSOR_NAME_LENGTH ] = "";
   char float_to_char_buffer[TEMP_MAX_FLOAT_LENGTH] = ""; // eg 25.9
 
   TempSensor t_sensor = temp_sensors[temp_index];
@@ -210,6 +217,12 @@ void publishTemp(int16_t temp_index) {
 
   client.publish(topic_plus_sensor_name, float_to_char_buffer);
   delay(20);
+}
+
+void publishTempSensors() {
+  for (int i=0; i<SIZE(temp_sensors); i++) {
+    publishTemp( i );
+  }
 }
 
 bool equalsToPinsTopic(char* recieved_topic) {
@@ -319,7 +332,7 @@ void setupInputPins() {
 void setup(void) {
   Serial.begin(9600);
   aSerial.setPrinter(Serial);
-  aSerial.setFilter(Level::vvvv);
+  aSerial.setFilter(Level::vvv);
 
   aSerial.l(Level::v).pln("Setup ...");
 
@@ -338,17 +351,5 @@ void setup(void) {
 
 void loop() {
   mqttLoop();
-
-  if(millis() - last_temp_read > TEMP_PUBLISH_DELAY) {
-    room_temp.requestTemperatures();
-
-    float temp = getTemperature(room_temp, room_low.address);
-
-    if( temp == DEVICE_DISCONNECTED_C ) aSerial.l(Level::v).p("ERROR: Temp sensor error").pln(temp);
-
-    publishTemp(0);
-
-    aSerial.l(Level::v).p(room_low.name).pln(temp);
-    last_temp_read = millis();
-  }
+  tempSensorsLoop();
 }
