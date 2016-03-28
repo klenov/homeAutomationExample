@@ -1,0 +1,12 @@
+[submodule "arduino/central_board/lib/advancedSerial"]
+	path = arduino/central_board/lib/advancedSerial
+	url = https://github.com/klenov/advancedSerial.git
+[submodule "arduino/central_board/lib/PubSubClient"]
+	path = arduino/central_board/lib/PubSubClient
+	url = https://github.com/knolleary/pubsubclient.git
+[submodule "arduino/central_board/lib/OneWire"]
+	path = arduino/central_board/lib/OneWire
+	url = https://github.com/PaulStoffregen/OneWire.git
+[submodule "arduino/central_board/lib/DallasTemperature"]
+	path = arduino/central_board/lib/DallasTemperature
+	url = https://github.com/milesburton/Arduino-Temperature-Control-Library.git
