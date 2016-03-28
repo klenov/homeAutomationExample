@@ -1,3 +1,7 @@
+/* Central Board Unit
+   This script is a part of my home automation setup 
+   Vasily Klenov, 2016
+*/
 
 // mqtt
 #include <SPI.h>
@@ -38,18 +42,12 @@ struct TempSensor {
   const char *name;
 };
 
-// arrays to hold device addresses
-// DeviceAddress  room_low = { 0x10, 0x13, 0xB0, 0x5B, 0x02, 0x08, 0x00, 0xC3 }, 
-//               room_high = { 0x10, 0x57, 0x87, 0x5B, 0x02, 0x08, 0x00, 0xBF };
-
 TempSensor room_low  = { room_temp, { 0x10, 0x13, 0xB0, 0x5B, 0x02, 0x08, 0x00, 0xC3 }, "RL" }; // !!! name can't be longer than TEMP_SENSOR_NAME_LENGTH - 1
 TempSensor room_high = { room_temp, { 0x10, 0x57, 0x87, 0x5B, 0x02, 0x08, 0x00, 0xBF }, "RH" };
 
 TempSensor out_1  = { outside_temp, { 0x10, 0x21, 0x71, 0x5B, 0x02, 0x08, 0x00, 0xAF }, "O1" };
 TempSensor out_2  = { outside_temp, { 0x10, 0x2E, 0xA4, 0x5B, 0x02, 0x08, 0x00, 0x07 }, "O2" };
 TempSensor chulan = { outside_temp, { 0x10, 0xB8, 0x9D, 0x5B, 0x02, 0x08, 0x00, 0x73 }, "CH" };
-
-// DeviceAddress  out1, out2, out3;
 
 TempSensor temp_sensors[] = { room_low, room_high, out_1, out_2, chulan };
 
@@ -99,6 +97,7 @@ float getTemperature(DallasTemperature &bus, DeviceAddress deviceAddress) {
 
 void tempSensorsLoop() {
   if(millis() - last_temp_read > TEMP_PUBLISH_DELAY) {
+    aSerial.l(Level::vvv).pln("tempSensorsLoop");
     room_temp.requestTemperatures();
     outside_temp.requestTemperatures();
 
@@ -111,9 +110,10 @@ void tempSensorsLoop() {
 
 /* #################  Ethernet                                                */
 
-uint8_t mac[] = { 0xA9, 0x10, 0x14, 0xE7, 0xAC, 0xCC };
-IPAddress     ip(192, 168, 2, 15);
-IPAddress server(192, 168, 2,  3);
+const uint8_t     cboard_mac[] = { 0xA9, 0x10, 0x14, 0xE7, 0xAC, 0xCC };
+const IPAddress   cboard_ip(192, 168, 2, 15);
+
+const IPAddress mqtt_server(192, 168, 2,  3);
 
 EthernetClient ethClient;
 
@@ -233,6 +233,7 @@ void mqttLoop() {
   if (!client.connected()) {
     uint32_t now = millis();
     if (now - lastReconnectAttempt > MQTT_RECONNECT_DELAY) {
+      aSerial.l(Level::v).pln("Connecting to MQTT server...");
       lastReconnectAttempt = now;
       // Attempt to reconnect
       if (reconnect()) {
@@ -250,7 +251,7 @@ void mqttLoop() {
   }
 }
 
-int16_t get_pin_number(char first_digit, char second_digit) {
+int16_t getPinNumber(char first_digit, char second_digit) {
   char str[3] = "XX";
   str[0] = first_digit;
   str[1] = second_digit;
@@ -315,7 +316,7 @@ void callback(char* recieved_topic, byte* payload, unsigned int length) {
   }
 
   bool state = ( payload[0] == '1' );
-  int16_t p_number = get_pin_number(first_digit, second_digit);
+  int16_t p_number = getPinNumber(first_digit, second_digit);
   changePinState(p_number, state);
 
 }
@@ -339,10 +340,10 @@ void setup(void) {
   setupTempSensors();
   setupInputPins();
 
-  client.setServer(server, 1883);
+  client.setServer(mqtt_server, 1883);
   client.setCallback(callback);
 
-  Ethernet.begin(mac, ip);
+  Ethernet.begin((uint8_t*)cboard_mac, cboard_ip);
   delay(3000);
 }
 
