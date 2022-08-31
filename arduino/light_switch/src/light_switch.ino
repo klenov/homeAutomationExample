@@ -1,18 +1,18 @@
 /* Web Switch Unit
-   This script is a part of my home automation setup 
+   This script is a part of my home automation setup
    Vasily Klenov, 2014
 
    If you are like me using ethernet shield based on ENC28J60
    then you should replace '#include <Ethernet.h>' with '#include <UIPEthernet.h>'
-   inside RestClient.h (and all other libraries if you added any).
+   inside RestClient.h (and all other libraries if you added any)
    Otherwise if you are using more common ethernet shield
    you should replace '#include <UIPEthernet.h>' with '#include <Ethernet.h>' in this file.
 
    For debugging via serial-monitor set DEBUG_SWITCHER to non-zero value.
    */
 
-#define SWITCH_DOOR  // switch located near entrance door
-// #define SWITCH_BED   // switch located near sleeping bed
+// #define SWITCH_DOOR  // switch located near entrance door
+#define SWITCH_BED   // switch located near sleeping bed
 
 #include <SPI.h>
 
@@ -28,7 +28,7 @@
 
 #define DEBUG_SWITCHER 0
 #define OPENHAB_HOST "192.168.2.3"
-#define OPENHAB_PORT 8088
+#define OPENHAB_PORT 8080
 
 #define SIZE(array) (sizeof(array) / sizeof(*array))
 
@@ -43,6 +43,7 @@ const byte mac[] = { 0x9C, 0x92, 0x27, 0x2D, 0xDA, 0x93 };
 
 const char* CONTENT_TYPE = "Content-Type:text/plain";
 const char* ACCEPT       = "Accept:application/json";
+const char* HOST         = "Host:192.168.2.3:8080";
 
 const int status_led_pin  = 16;
 
@@ -86,7 +87,7 @@ void setup()
 void loop()
 {
   #if DEBUG_SWITCHER
-    //Serial.println(".");
+    // Serial.println(".");
   #endif
   
   delay(100);
@@ -132,6 +133,7 @@ void set_headers()
 {
   client.setHeader(CONTENT_TYPE);
   client.setHeader(ACCEPT);
+  client.setHeader(HOST);
 }
 
 int send_request_to_api(int b_number)
@@ -155,15 +157,15 @@ char* lights_url_by_button_number(int button_number)
 {  
   switch (button_number) {
     case 0:
-      return "/CMD?Virtual_Switch_1=TOGGLE";
+      return "/basicui/CMD?Light_1=TOGGLE";
     case 1:
-      return "/CMD?Virtual_Switch_2=TOGGLE";
+      return "/basicui/CMD?Light_2=TOGGLE";
     case 2:
-      return "/CMD?Virtual_Switch_3=TOGGLE";
+      return "/basicui/CMD?Light_3=TOGGLE";
     case 3:
-      return "/CMD?Virtual_Switch_4=TOGGLE";
+      return "/basicui/CMD?Power_3=TOGGLE";
     case 4:
-      return "/CMD?Virtual_Switch_5=TOGGLE";
+      return "/basicui/CMD?Virtual_Switch_5=TOGGLE";
     default:
       return "";
   }

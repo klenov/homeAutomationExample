@@ -1,6 +1,8 @@
 #include <Arduino.h>
 #include <SPI.h>
-#include <UIPEthernet.h>
+
+#include <Ethernet.h>
+//#include <UIPEthernet.h>  // https://github.com/ntruchsess/arduino_uip
 
 class RestClient {
 
