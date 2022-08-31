@@ -1,6 +1,9 @@
 /* Central Board Unit
    This script is a part of my home automation setup 
    Vasily Klenov, 2016
+
+   to control pin state send mqtt message:
+   home/control/cboard/pins/43, payload 0 or 1
 */
 
 // mqtt
